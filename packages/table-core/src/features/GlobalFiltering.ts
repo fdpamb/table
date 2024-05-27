@@ -32,7 +32,10 @@ export interface GlobalFilterColumn {
   getCanGlobalFilter: () => boolean
 }
 
-export interface GlobalFilterOptions<TData extends RowData> {
+export interface GlobalFilterOptions<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Enables/disables **global** filtering for all columns.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/global-filtering#enableglobalfilter)
@@ -46,7 +49,9 @@ export interface GlobalFilterOptions<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/global-filtering#getcolumncanglobalfilter)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/global-filtering)
    */
-  getColumnCanGlobalFilter?: (column: Column<TData, unknown>) => boolean
+  getColumnCanGlobalFilter?: (
+    column: Column<TData, unknown, TFeatures>
+  ) => boolean
   /**
    * The filter function to use for global filtering.
    * - A `string` referencing a built-in filter function
@@ -55,7 +60,7 @@ export interface GlobalFilterOptions<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/global-filtering#globalfilterfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/global-filtering)
    */
-  globalFilterFn?: FilterFnOption<TData>
+  globalFilterFn?: FilterFnOption<TData, TFeatures>
   /**
    * If provided, this function will be called with an `updaterFn` when `state.globalFilter` changes. This overrides the default internal state management, so you will need to persist the state change either fully or partially outside of the table.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/global-filtering#onglobalfilterchange)
@@ -64,19 +69,22 @@ export interface GlobalFilterOptions<TData extends RowData> {
   onGlobalFilterChange?: OnChangeFn<any>
 }
 
-export interface GlobalFilterInstance<TData extends RowData> {
+export interface GlobalFilterInstance<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Currently, this function returns the built-in `includesString` filter function. In future releases, it may return more dynamic filter functions based on the nature of the data provided.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/global-filtering#getglobalautofilterfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/global-filtering)
    */
-  getGlobalAutoFilterFn: () => FilterFn<TData> | undefined
+  getGlobalAutoFilterFn: () => FilterFn<TData, TFeatures> | undefined
   /**
    * Returns the filter function (either user-defined or automatic, depending on configuration) for the global filter.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/global-filtering#getglobalfilterfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/global-filtering)
    */
-  getGlobalFilterFn: () => FilterFn<TData> | undefined
+  getGlobalFilterFn: () => FilterFn<TData, TFeatures> | undefined
   /**
    * Resets the **globalFilter** state to `initialState.globalFilter`, or `true` can be passed to force a default blank state reset to `undefined`.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/global-filtering#resetglobalfilter)
@@ -101,9 +109,12 @@ export const GlobalFiltering: TableFeature = {
     }
   },
 
-  getDefaultOptions: <TData extends RowData>(
-    table: Table<TData>
-  ): GlobalFilterOptions<TData> => {
+  getDefaultOptions: <
+    TData extends RowData,
+    TFeatures extends TableFeatures = {},
+  >(
+    table: Table<TData, TFeatures>
+  ): GlobalFilterOptions<TData, TFeatures> => {
     return {
       onGlobalFilterChange: makeStateUpdater('globalFilter', table),
       globalFilterFn: 'auto',
@@ -115,12 +126,16 @@ export const GlobalFiltering: TableFeature = {
 
         return typeof value === 'string' || typeof value === 'number'
       },
-    } as GlobalFilterOptions<TData>
+    } as GlobalFilterOptions<TData, TFeatures>
   },
 
-  createColumn: <TData extends RowData>(
-    column: Column<TData, unknown>,
-    table: Table<TData>
+  createColumn: <
+    TData extends RowData,
+    TValue,
+    TFeatures extends TableFeatures = {},
+  >(
+    column: Column<TData, unknown, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     column.getCanGlobalFilter = () => {
       return (
@@ -133,7 +148,9 @@ export const GlobalFiltering: TableFeature = {
     }
   },
 
-  createTable: <TData extends RowData>(table: Table<TData>): void => {
+  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    table: Table<TData, TFeatures>
+  ): void => {
     table.getGlobalAutoFilterFn = () => {
       return filterFns.includesString
     }

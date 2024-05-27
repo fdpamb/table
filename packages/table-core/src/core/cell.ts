@@ -1,34 +1,42 @@
 import { RowData, Cell, Column, Row, Table } from '../types'
 import { Getter, getMemoOptions, memo } from '../utils'
 
-export interface CellContext<TData extends RowData, TValue> {
-  cell: Cell<TData, TValue>
-  column: Column<TData, TValue>
+export interface CellContext<
+  TData extends RowData,
+  TValue,
+  TFeatures extends TableFeatures = {},
+> {
+  cell: Cell<TData, TValue, TFeatures>
+  column: Column<TData, TValue, TFeatures>
   getValue: Getter<TValue>
   renderValue: Getter<TValue | null>
-  row: Row<TData>
-  table: Table<TData>
+  row: Row<TData, TFeatures>
+  table: Table<TData, TFeatures>
 }
 
-export interface CoreCell<TData extends RowData, TValue> {
+export interface CoreCell<
+  TData extends RowData,
+  TValue,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * The associated Column object for the cell.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/cell#column)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/cells)
    */
-  column: Column<TData, TValue>
+  column: Column<TData, TValue, TFeatures>
   /**
    * Returns the rendering context (or props) for cell-based components like cells and aggregated cells. Use these props with your framework's `flexRender` utility to render these using the template of your choice:
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/cell#getcontext)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/cells)
    */
-  getContext: () => CellContext<TData, TValue>
+  getContext: () => CellContext<TData, TValue, TFeatures>
   /**
    * Returns the value for the cell, accessed via the associated column's accessor key or accessor function.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/cell#getvalue)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/cells)
    */
-  getValue: CellContext<TData, TValue>['getValue']
+  getValue: CellContext<TData, TValue, TFeatures>['getValue']
   /**
    * The unique ID for the cell across the entire table.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/cell#id)
@@ -40,25 +48,29 @@ export interface CoreCell<TData extends RowData, TValue> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/cell#rendervalue)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/cells)
    */
-  renderValue: CellContext<TData, TValue>['renderValue']
+  renderValue: CellContext<TData, TValue, TFeatures>['renderValue']
   /**
    * The associated Row object for the cell.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/cell#row)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/cells)
    */
-  row: Row<TData>
+  row: Row<TData, TFeatures>
 }
 
-export function createCell<TData extends RowData, TValue>(
-  table: Table<TData>,
-  row: Row<TData>,
-  column: Column<TData, TValue>,
+export function createCell<
+  TData extends RowData,
+  TValue,
+  TFeatures extends TableFeatures = {},
+>(
+  table: Table<TData, TFeatures>,
+  row: Row<TData, TFeatures>,
+  column: Column<TData, TValue, TFeatures>,
   columnId: string
-): Cell<TData, TValue> {
+): Cell<TData, TValue, TFeatures> {
   const getRenderValue = () =>
     cell.getValue() ?? table.options.renderFallbackValue
 
-  const cell: CoreCell<TData, TValue> = {
+  const cell: CoreCell<TData, TValue, TFeatures> = {
     id: `${row.id}_${column.id}`,
     row,
     column,
@@ -70,7 +82,7 @@ export function createCell<TData extends RowData, TValue>(
         table,
         column,
         row,
-        cell: cell as Cell<TData, TValue>,
+        cell: cell as Cell<TData, TValue, TFeatures>,
         getValue: cell.getValue,
         renderValue: cell.renderValue,
       }),
@@ -80,12 +92,12 @@ export function createCell<TData extends RowData, TValue>(
 
   table._features.forEach(feature => {
     feature.createCell?.(
-      cell as Cell<TData, TValue>,
+      cell as Cell<TData, TValue, TFeatures>,
       column,
-      row as Row<TData>,
+      row as Row<TData, TFeatures>,
       table
     )
   }, {})
 
-  return cell as Cell<TData, TValue>
+  return cell as Cell<TData, TValue, TFeatures>
 }

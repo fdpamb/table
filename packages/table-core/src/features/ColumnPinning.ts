@@ -1,3 +1,4 @@
+import { TableFeatures } from '../core/table'
 import {
   OnChangeFn,
   Updater,
@@ -83,34 +84,40 @@ export interface ColumnPinningColumn {
   pin: (position: ColumnPinningPosition) => void
 }
 
-export interface ColumnPinningRow<TData extends RowData> {
+export interface ColumnPinningRow<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Returns all center pinned (unpinned) leaf cells in the row.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-pinning#getcentervisiblecells)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-pinning)
    */
-  getCenterVisibleCells: () => Cell<TData, unknown>[]
+  getCenterVisibleCells: () => Cell<TData, unknown, TFeatures>[]
   /**
    * Returns all left pinned leaf cells in the row.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-pinning#getleftvisiblecells)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-pinning)
    */
-  getLeftVisibleCells: () => Cell<TData, unknown>[]
+  getLeftVisibleCells: () => Cell<TData, unknown, TFeatures>[]
   /**
    * Returns all right pinned leaf cells in the row.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-pinning#getrightvisiblecells)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-pinning)
    */
-  getRightVisibleCells: () => Cell<TData, unknown>[]
+  getRightVisibleCells: () => Cell<TData, unknown, TFeatures>[]
 }
 
-export interface ColumnPinningInstance<TData extends RowData> {
+export interface ColumnPinningInstance<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Returns all center pinned (unpinned) leaf columns.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-pinning#getcenterleafcolumns)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-pinning)
    */
-  getCenterLeafColumns: () => Column<TData, unknown>[]
+  getCenterLeafColumns: () => Column<TData, unknown, TFeatures>[]
   /**
    * Returns whether or not any columns are pinned. Optionally specify to only check for pinned columns in either the `left` or `right` position.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-pinning#getissomecolumnspinned)
@@ -122,13 +129,13 @@ export interface ColumnPinningInstance<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-pinning#getleftleafcolumns)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-pinning)
    */
-  getLeftLeafColumns: () => Column<TData, unknown>[]
+  getLeftLeafColumns: () => Column<TData, unknown, TFeatures>[]
   /**
    * Returns all right pinned leaf columns.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-pinning#getrightleafcolumns)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-pinning)
    */
-  getRightLeafColumns: () => Column<TData, unknown>[]
+  getRightLeafColumns: () => Column<TData, unknown, TFeatures>[]
   /**
    * Resets the **columnPinning** state to `initialState.columnPinning`, or `true` can be passed to force a default blank state reset to `{ left: [], right: [], }`.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-pinning#resetcolumnpinning)
@@ -158,17 +165,24 @@ export const ColumnPinning: TableFeature = {
     }
   },
 
-  getDefaultOptions: <TData extends RowData>(
-    table: Table<TData>
+  getDefaultOptions: <
+    TData extends RowData,
+    TFeatures extends TableFeatures = {},
+  >(
+    table: Table<TData, TFeatures>
   ): ColumnPinningDefaultOptions => {
     return {
       onColumnPinningChange: makeStateUpdater('columnPinning', table),
     }
   },
 
-  createColumn: <TData extends RowData, TValue>(
-    column: Column<TData, TValue>,
-    table: Table<TData>
+  createColumn: <
+    TData extends RowData,
+    TValue,
+    TFeatures extends TableFeatures = {},
+  >(
+    column: Column<TData, TValue, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     column.pin = position => {
       const columnIds = column
@@ -236,9 +250,9 @@ export const ColumnPinning: TableFeature = {
     }
   },
 
-  createRow: <TData extends RowData>(
-    row: Row<TData>,
-    table: Table<TData>
+  createRow: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    row: Row<TData, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     row.getCenterVisibleCells = memo(
       () => [
@@ -259,7 +273,9 @@ export const ColumnPinning: TableFeature = {
         const cells = (left ?? [])
           .map(columnId => allCells.find(cell => cell.column.id === columnId)!)
           .filter(Boolean)
-          .map(d => ({ ...d, position: 'left' }) as Cell<TData, unknown>)
+          .map(
+            d => ({ ...d, position: 'left' }) as Cell<TData, unknown, TFeatures>
+          )
 
         return cells
       },
@@ -271,7 +287,10 @@ export const ColumnPinning: TableFeature = {
         const cells = (right ?? [])
           .map(columnId => allCells.find(cell => cell.column.id === columnId)!)
           .filter(Boolean)
-          .map(d => ({ ...d, position: 'right' }) as Cell<TData, unknown>)
+          .map(
+            d =>
+              ({ ...d, position: 'right' }) as Cell<TData, unknown, TFeatures>
+          )
 
         return cells
       },
@@ -279,7 +298,9 @@ export const ColumnPinning: TableFeature = {
     )
   },
 
-  createTable: <TData extends RowData>(table: Table<TData>): void => {
+  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    table: Table<TData, TFeatures>
+  ): void => {
     table.setColumnPinning = updater =>
       table.options.onColumnPinningChange?.(updater)
 

@@ -71,9 +71,12 @@ export interface PaginationDefaultOptions {
   onPaginationChange: OnChangeFn<PaginationState>
 }
 
-export interface PaginationInstance<TData extends RowData> {
+export interface PaginationInstance<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   _autoResetPageIndex: () => void
-  _getPaginationRowModel?: () => RowModel<TData>
+  _getPaginationRowModel?: () => RowModel<TData, TFeatures>
   /**
    * Returns whether the table can go to the next page.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#getcannextpage)
@@ -109,13 +112,13 @@ export interface PaginationInstance<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#getpaginationrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/pagination)
    */
-  getPaginationRowModel: () => RowModel<TData>
+  getPaginationRowModel: () => RowModel<TData, TFeatures>
   /**
    * Returns the row model for the table before any pagination has been applied.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#getprepaginationrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/pagination)
    */
-  getPrePaginationRowModel: () => RowModel<TData>
+  getPrePaginationRowModel: () => RowModel<TData, TFeatures>
   /**
    * Increments the page index by one, if possible.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#nextpage)
@@ -203,15 +206,20 @@ export const RowPagination: TableFeature = {
     }
   },
 
-  getDefaultOptions: <TData extends RowData>(
-    table: Table<TData>
+  getDefaultOptions: <
+    TData extends RowData,
+    TFeatures extends TableFeatures = {},
+  >(
+    table: Table<TData, TFeatures>
   ): PaginationDefaultOptions => {
     return {
       onPaginationChange: makeStateUpdater('pagination', table),
     }
   },
 
-  createTable: <TData extends RowData>(table: Table<TData>): void => {
+  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    table: Table<TData, TFeatures>
+  ): void => {
     let registered = false
     let queued = false
 

@@ -2,20 +2,21 @@ import { createRow } from '../core/row'
 import { Table, Row, RowModel, RowData } from '../types'
 import { getMemoOptions, memo } from '../utils'
 
-export function getCoreRowModel<TData extends RowData>(): (
-  table: Table<TData>
-) => () => RowModel<TData> {
+export function getCoreRowModel<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(): (table: Table<TData, TFeatures>) => () => RowModel<TData, TFeatures> {
   return table =>
     memo(
       () => [table.options.data],
       (
         data
       ): {
-        rows: Row<TData>[]
-        flatRows: Row<TData>[]
-        rowsById: Record<string, Row<TData>>
+        rows: Row<TData, TFeatures>[]
+        flatRows: Row<TData, TFeatures>[]
+        rowsById: Record<string, Row<TData, TFeatures>>
       } => {
-        const rowModel: RowModel<TData> = {
+        const rowModel: RowModel<TData, TFeatures> = {
           rows: [],
           flatRows: [],
           rowsById: {},
@@ -24,9 +25,9 @@ export function getCoreRowModel<TData extends RowData>(): (
         const accessRows = (
           originalRows: TData[],
           depth = 0,
-          parentRow?: Row<TData>
-        ): Row<TData>[] => {
-          const rows = [] as Row<TData>[]
+          parentRow?: Row<TData, TFeatures>
+        ): Row<TData, TFeatures>[] => {
+          const rows = [] as Row<TData, TFeatures>[]
 
           for (let i = 0; i < originalRows.length; i++) {
             // This could be an expensive check at scale, so we should move it somewhere else, but where?

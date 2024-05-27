@@ -2,9 +2,10 @@ import { Table, Row, RowModel, RowData } from '../types'
 import { SortingFn } from '../features/RowSorting'
 import { getMemoOptions, memo } from '../utils'
 
-export function getSortedRowModel<TData extends RowData>(): (
-  table: Table<TData>
-) => () => RowModel<TData> {
+export function getSortedRowModel<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(): (table: Table<TData, TFeatures>) => () => RowModel<TData, TFeatures> {
   return table =>
     memo(
       () => [table.getState().sorting, table.getPreSortedRowModel()],
@@ -15,7 +16,7 @@ export function getSortedRowModel<TData extends RowData>(): (
 
         const sortingState = table.getState().sorting
 
-        const sortedFlatRows: Row<TData>[] = []
+        const sortedFlatRows: Row<TData, TFeatures>[] = []
 
         // Filter out sortings that correspond to non existing columns
         const availableSorting = sortingState.filter(
@@ -27,7 +28,7 @@ export function getSortedRowModel<TData extends RowData>(): (
           {
             sortUndefined?: false | -1 | 1 | 'first' | 'last'
             invertSorting?: boolean
-            sortingFn: SortingFn<TData>
+            sortingFn: SortingFn<TData, TFeatures>
           }
         > = {}
 
@@ -42,7 +43,7 @@ export function getSortedRowModel<TData extends RowData>(): (
           }
         })
 
-        const sortData = (rows: Row<TData>[]) => {
+        const sortData = (rows: Row<TData, TFeatures>[]) => {
           // This will also perform a stable sorting using the row index
           // if needed.
           const sortedData = rows.map(row => ({ ...row }))

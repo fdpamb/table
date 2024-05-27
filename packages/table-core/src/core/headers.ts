@@ -7,31 +7,43 @@ import {
   TableFeature,
 } from '../types'
 import { getMemoOptions, memo } from '../utils'
+import { TableFeatures } from './table'
 
 const debug = 'debugHeaders'
 
-export interface CoreHeaderGroup<TData extends RowData> {
+export interface CoreHeaderGroup<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   depth: number
-  headers: Header<TData, unknown>[]
+  headers: Header<TData, unknown, TFeatures>[]
   id: string
 }
 
-export interface HeaderContext<TData, TValue> {
+export interface HeaderContext<
+  TData extends RowData,
+  TValue,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * An instance of a column.
    */
-  column: Column<TData, TValue>
+  column: Column<TData, TValue, TFeatures>
   /**
    * An instance of a header.
    */
-  header: Header<TData, TValue>
+  header: Header<TData, TValue, TFeatures>
   /**
    * The table instance.
    */
-  table: Table<TData>
+  table: Table<TData, TFeatures>
 }
 
-export interface CoreHeader<TData extends RowData, TValue> {
+export interface CoreHeader<
+  TData extends RowData,
+  TValue,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * The col-span for the header.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/header#colspan)
@@ -43,7 +55,7 @@ export interface CoreHeader<TData extends RowData, TValue> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/header#column)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  column: Column<TData, TValue>
+  column: Column<TData, TValue, TFeatures>
   /**
    * The depth of the header, zero-indexed based.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/header#depth)
@@ -55,19 +67,19 @@ export interface CoreHeader<TData extends RowData, TValue> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/header#getcontext)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getContext: () => HeaderContext<TData, TValue>
+  getContext: () => HeaderContext<TData, TValue, TFeatures>
   /**
    * Returns the leaf headers hierarchically nested under this header.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/header#getleafheaders)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getLeafHeaders: () => Header<TData, unknown>[]
+  getLeafHeaders: () => Header<TData, unknown, TFeatures>[]
   /**
    * The header's associated header group object.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/header#headergroup)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  headerGroup: HeaderGroup<TData>
+  headerGroup: HeaderGroup<TData, TFeatures>
   /**
    * The unique identifier for the header.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/header#id)
@@ -103,116 +115,123 @@ export interface CoreHeader<TData extends RowData, TValue> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/header#subheaders)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  subHeaders: Header<TData, TValue>[]
+  subHeaders: Header<TData, TValue, TFeatures>[]
 }
 
-export interface HeadersInstance<TData extends RowData> {
+export interface HeadersInstance<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Returns all header groups for the table.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getheadergroups)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getHeaderGroups: () => HeaderGroup<TData>[]
+  getHeaderGroups: () => HeaderGroup<TData, TFeatures>[]
   /**
    * If pinning, returns the header groups for the left pinned columns.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getleftheadergroups)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getLeftHeaderGroups: () => HeaderGroup<TData>[]
+  getLeftHeaderGroups: () => HeaderGroup<TData, TFeatures>[]
   /**
    * If pinning, returns the header groups for columns that are not pinned.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getcenterheadergroups)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getCenterHeaderGroups: () => HeaderGroup<TData>[]
+  getCenterHeaderGroups: () => HeaderGroup<TData, TFeatures>[]
   /**
    * If pinning, returns the header groups for the right pinned columns.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getrightheadergroups)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getRightHeaderGroups: () => HeaderGroup<TData>[]
+  getRightHeaderGroups: () => HeaderGroup<TData, TFeatures>[]
 
   /**
    * Returns the footer groups for the table.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getfootergroups)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getFooterGroups: () => HeaderGroup<TData>[]
+  getFooterGroups: () => HeaderGroup<TData, TFeatures>[]
   /**
    * If pinning, returns the footer groups for the left pinned columns.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getleftfootergroups)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getLeftFooterGroups: () => HeaderGroup<TData>[]
+  getLeftFooterGroups: () => HeaderGroup<TData, TFeatures>[]
   /**
    * If pinning, returns the footer groups for columns that are not pinned.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getcenterfootergroups)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getCenterFooterGroups: () => HeaderGroup<TData>[]
+  getCenterFooterGroups: () => HeaderGroup<TData, TFeatures>[]
   /**
    * If pinning, returns the footer groups for the right pinned columns.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getrightfootergroups)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getRightFooterGroups: () => HeaderGroup<TData>[]
+  getRightFooterGroups: () => HeaderGroup<TData, TFeatures>[]
 
   /**
    * Returns headers for all columns in the table, including parent headers.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getflatheaders)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getFlatHeaders: () => Header<TData, unknown>[]
+  getFlatHeaders: () => Header<TData, unknown, TFeatures>[]
   /**
    * If pinning, returns headers for all left pinned columns in the table, including parent headers.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getleftflatheaders)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getLeftFlatHeaders: () => Header<TData, unknown>[]
+  getLeftFlatHeaders: () => Header<TData, unknown, TFeatures>[]
   /**
    * If pinning, returns headers for all columns that are not pinned, including parent headers.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getcenterflatheaders)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getCenterFlatHeaders: () => Header<TData, unknown>[]
+  getCenterFlatHeaders: () => Header<TData, unknown, TFeatures>[]
   /**
    * If pinning, returns headers for all right pinned columns in the table, including parent headers.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getrightflatheaders)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getRightFlatHeaders: () => Header<TData, unknown>[]
+  getRightFlatHeaders: () => Header<TData, unknown, TFeatures>[]
 
   /**
    * Returns headers for all leaf columns in the table, (not including parent headers).
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getleafheaders)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getLeafHeaders: () => Header<TData, unknown>[]
+  getLeafHeaders: () => Header<TData, unknown, TFeatures>[]
   /**
    * If pinning, returns headers for all left pinned leaf columns in the table, (not including parent headers).
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getleftleafheaders)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getLeftLeafHeaders: () => Header<TData, unknown>[]
+  getLeftLeafHeaders: () => Header<TData, unknown, TFeatures>[]
   /**
    * If pinning, returns headers for all columns that are not pinned, (not including parent headers).
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getcenterleafheaders)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getCenterLeafHeaders: () => Header<TData, unknown>[]
+  getCenterLeafHeaders: () => Header<TData, unknown, TFeatures>[]
   /**
    * If pinning, returns headers for all right pinned leaf columns in the table, (not including parent headers).
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/headers#getrightleafheaders)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/headers)
    */
-  getRightLeafHeaders: () => Header<TData, unknown>[]
+  getRightLeafHeaders: () => Header<TData, unknown, TFeatures>[]
 }
 
 //
 
-function createHeader<TData extends RowData, TValue>(
-  table: Table<TData>,
-  column: Column<TData, TValue>,
+function createHeader<
+  TData extends RowData,
+  TValue,
+  TFeatures extends TableFeatures = {},
+>(
+  table: Table<TData, TFeatures>,
+  column: Column<TData, TValue, TFeatures>,
   options: {
     id?: string
     isPlaceholder?: boolean
@@ -220,10 +239,10 @@ function createHeader<TData extends RowData, TValue>(
     index: number
     depth: number
   }
-): Header<TData, TValue> {
+): Header<TData, TValue, TFeatures> {
   const id = options.id ?? column.id
 
-  let header: CoreHeader<TData, TValue> = {
+  let header: CoreHeader<TData, TValue, TFeatures> = {
     id,
     column,
     index: options.index,
@@ -234,14 +253,14 @@ function createHeader<TData extends RowData, TValue>(
     colSpan: 0,
     rowSpan: 0,
     headerGroup: null!,
-    getLeafHeaders: (): Header<TData, unknown>[] => {
-      const leafHeaders: Header<TData, unknown>[] = []
+    getLeafHeaders: (): Header<TData, unknown, TFeatures>[] => {
+      const leafHeaders: Header<TData, unknown, TFeatures>[] = []
 
       const recurseHeader = (h: CoreHeader<TData, any>) => {
         if (h.subHeaders && h.subHeaders.length) {
           h.subHeaders.map(recurseHeader)
         }
-        leafHeaders.push(h as Header<TData, unknown>)
+        leafHeaders.push(h as Header<TData, unknown, TFeatures>)
       }
 
       recurseHeader(header)
@@ -250,20 +269,22 @@ function createHeader<TData extends RowData, TValue>(
     },
     getContext: () => ({
       table,
-      header: header as Header<TData, TValue>,
+      header: header as Header<TData, TValue, TFeatures>,
       column,
     }),
   }
 
   table._features.forEach(feature => {
-    feature.createHeader?.(header as Header<TData, TValue>, table)
+    feature.createHeader?.(header as Header<TData, TValue, TFeatures>, table)
   })
 
-  return header as Header<TData, TValue>
+  return header as Header<TData, TValue, TFeatures>
 }
 
 export const Headers: TableFeature = {
-  createTable: <TData extends RowData>(table: Table<TData>): void => {
+  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    table: Table<TData, TFeatures>
+  ): void => {
     // Header Groups
 
     table.getHeaderGroups = memo(
@@ -481,10 +502,13 @@ export const Headers: TableFeature = {
   },
 }
 
-export function buildHeaderGroups<TData extends RowData>(
-  allColumns: Column<TData, unknown>[],
-  columnsToGroup: Column<TData, unknown>[],
-  table: Table<TData>,
+export function buildHeaderGroups<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(
+  allColumns: Column<TData, unknown, TFeatures>[],
+  columnsToGroup: Column<TData, unknown, TFeatures>[],
+  table: Table<TData, TFeatures>,
   headerFamily?: 'center' | 'left' | 'right'
 ) {
   // Find the max depth of the columns:
@@ -495,7 +519,10 @@ export function buildHeaderGroups<TData extends RowData>(
 
   let maxDepth = 0
 
-  const findMaxDepth = (columns: Column<TData, unknown>[], depth = 1) => {
+  const findMaxDepth = (
+    columns: Column<TData, unknown, TFeatures>[],
+    depth = 1
+  ) => {
     maxDepth = Math.max(maxDepth, depth)
 
     columns
@@ -509,21 +536,21 @@ export function buildHeaderGroups<TData extends RowData>(
 
   findMaxDepth(allColumns)
 
-  let headerGroups: HeaderGroup<TData>[] = []
+  let headerGroups: HeaderGroup<TData, TFeatures>[] = []
 
   const createHeaderGroup = (
-    headersToGroup: Header<TData, unknown>[],
+    headersToGroup: Header<TData, unknown, TFeatures>[],
     depth: number
   ) => {
     // The header group we are creating
-    const headerGroup: HeaderGroup<TData> = {
+    const headerGroup: HeaderGroup<TData, TFeatures> = {
       depth,
       id: [headerFamily, `${depth}`].filter(Boolean).join('_'),
       headers: [],
     }
 
     // The parent columns we're going to scan next
-    const pendingParentHeaders: Header<TData, unknown>[] = []
+    const pendingParentHeaders: Header<TData, unknown, TFeatures>[] = []
 
     // Scan each column for parents
     headersToGroup.forEach(headerToGroup => {
@@ -533,7 +560,7 @@ export function buildHeaderGroups<TData extends RowData>(
 
       const isLeafHeader = headerToGroup.column.depth === headerGroup.depth
 
-      let column: Column<TData, unknown>
+      let column: Column<TData, unknown, TFeatures>
       let isPlaceholder = false
 
       if (isLeafHeader && headerToGroup.column.parent) {
@@ -599,7 +626,7 @@ export function buildHeaderGroups<TData extends RowData>(
   // })
 
   const recurseHeadersForSpans = (
-    headers: Header<TData, unknown>[]
+    headers: Header<TData, unknown, TFeatures>[]
   ): { colSpan: number; rowSpan: number }[] => {
     const filteredHeaders = headers.filter(header =>
       header.column.getIsVisible()

@@ -1,9 +1,12 @@
-import { RowModel } from '..'
+import { RowModel, TableFeatures } from '..'
 import { Column, RowData, Table, TableFeature } from '../types'
 
-export interface FacetedColumn<TData extends RowData> {
+export interface ColumnFacetingColumn<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   _getFacetedMinMaxValues?: () => undefined | [number, number]
-  _getFacetedRowModel?: () => RowModel<TData>
+  _getFacetedRowModel?: () => RowModel<TData, TFeatures>
   _getFacetedUniqueValues?: () => Map<any, number>
   /**
    * A function that **computes and returns** a min/max tuple derived from `column.getFacetedRowModel`. Useful for displaying faceted result values.
@@ -18,7 +21,7 @@ export interface FacetedColumn<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-faceting#getfacetedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-faceting)
    */
-  getFacetedRowModel: () => RowModel<TData>
+  getFacetedRowModel: () => RowModel<TData, TFeatures>
   /**
    * A function that **computes and returns** a `Map` of unique values and their occurrences derived from `column.getFacetedRowModel`. Useful for displaying faceted result values.
    * > ⚠️ Requires that you pass a valid `getFacetedUniqueValues` function to `options.getFacetedUniqueValues`. A default implementation is provided via the exported `getFacetedUniqueValues` function.
@@ -28,17 +31,20 @@ export interface FacetedColumn<TData extends RowData> {
   getFacetedUniqueValues: () => Map<any, number>
 }
 
-export interface FacetedOptions<TData extends RowData> {
+export interface ColumnFacetingOptions<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   getFacetedMinMaxValues?: (
-    table: Table<TData>,
+    table: Table<TData, TFeatures>,
     columnId: string
   ) => () => undefined | [number, number]
   getFacetedRowModel?: (
-    table: Table<TData>,
+    table: Table<TData, TFeatures>,
     columnId: string
-  ) => () => RowModel<TData>
+  ) => () => RowModel<TData, TFeatures>
   getFacetedUniqueValues?: (
-    table: Table<TData>,
+    table: Table<TData, TFeatures>,
     columnId: string
   ) => () => Map<any, number>
 }
@@ -46,9 +52,13 @@ export interface FacetedOptions<TData extends RowData> {
 //
 
 export const ColumnFaceting: TableFeature = {
-  createColumn: <TData extends RowData>(
-    column: Column<TData, unknown>,
-    table: Table<TData>
+  createColumn: <
+    TData extends RowData,
+    TValue,
+    TFeatures extends TableFeatures = {},
+  >(
+    column: Column<TData, TValue, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     column._getFacetedRowModel =
       table.options.getFacetedRowModel &&

@@ -1,9 +1,12 @@
 import { RowModel } from '..'
 import { Table, RowData, TableFeature } from '../types'
 
-export interface GlobalFacetingInstance<TData extends RowData> {
+export interface GlobalFacetingInstance<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   _getGlobalFacetedMinMaxValues?: () => undefined | [number, number]
-  _getGlobalFacetedRowModel?: () => RowModel<TData>
+  _getGlobalFacetedRowModel?: () => RowModel<TData, TFeatures>
   _getGlobalFacetedUniqueValues?: () => Map<any, number>
   /**
    * Currently, this function returns the built-in `includesString` filter function. In future releases, it may return more dynamic filter functions based on the nature of the data provided.
@@ -16,7 +19,7 @@ export interface GlobalFacetingInstance<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/global-faceting#getglobalfacetedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/global-faceting)
    */
-  getGlobalFacetedRowModel: () => RowModel<TData>
+  getGlobalFacetedRowModel: () => RowModel<TData, TFeatures>
   /**
    * Returns the faceted unique values for the global filter.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/global-faceting#getglobalfaceteduniquevalues)
@@ -28,7 +31,9 @@ export interface GlobalFacetingInstance<TData extends RowData> {
 //
 
 export const GlobalFaceting: TableFeature = {
-  createTable: <TData extends RowData>(table: Table<TData>): void => {
+  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    table: Table<TData, TFeatures>
+  ): void => {
     table._getGlobalFacetedRowModel =
       table.options.getFacetedRowModel &&
       table.options.getFacetedRowModel(table, '__global__')

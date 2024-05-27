@@ -1,4 +1,4 @@
-import { RowModel } from '..'
+import { RowModel, TableFeatures } from '..'
 import { BuiltInAggregationFn, aggregationFns } from '../aggregationFns'
 import {
   AggregationFns,
@@ -14,41 +14,51 @@ import {
 } from '../types'
 import { isFunction, makeStateUpdater } from '../utils'
 
-export type GroupingState = string[]
+export type ColumnGroupingState = string[]
 
-export interface GroupingTableState {
-  grouping: GroupingState
+export interface ColumnGroupingTableState {
+  grouping: ColumnGroupingState
 }
 
-export type AggregationFn<TData extends RowData> = (
+export type AggregationFn<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> = (
   columnId: string,
-  leafRows: Row<TData>[],
-  childRows: Row<TData>[]
+  leafRows: Row<TData, TFeatures>[],
+  childRows: Row<TData, TFeatures>[]
 ) => any
 
 export type CustomAggregationFns = Record<string, AggregationFn<any>>
 
-export type AggregationFnOption<TData extends RowData> =
+export type AggregationFnOption<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> =
   | 'auto'
   | keyof AggregationFns
   | BuiltInAggregationFn
-  | AggregationFn<TData>
+  | AggregationFn<TData, TFeatures>
 
-export interface GroupingColumnDef<TData extends RowData, TValue> {
+export interface ColumnGroupingColumnDef<
+  TData extends RowData,
+  TValue,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * The cell to display each row for the column if the cell is an aggregate. If a function is passed, it will be passed a props object with the context of the cell and should return the property type for your adapter (the exact type depends on the adapter being used).
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#aggregatedcell)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/grouping)
    */
   aggregatedCell?: ColumnDefTemplate<
-    ReturnType<Cell<TData, TValue>['getContext']>
+    ReturnType<Cell<TData, TValue, TFeatures>['getContext']>
   >
   /**
    * The resolved aggregation function for the column.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#aggregationfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/grouping)
    */
-  aggregationFn?: AggregationFnOption<TData>
+  aggregationFn?: AggregationFnOption<TData, TFeatures>
   /**
    * Enables/disables grouping for this column.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#enablegrouping)
@@ -63,19 +73,22 @@ export interface GroupingColumnDef<TData extends RowData, TValue> {
   getGroupingValue?: (row: TData) => any
 }
 
-export interface GroupingColumn<TData extends RowData> {
+export interface ColumnGroupingColumn<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Returns the aggregation function for the column.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#getaggregationfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/grouping)
    */
-  getAggregationFn: () => AggregationFn<TData> | undefined
+  getAggregationFn: () => AggregationFn<TData, TFeatures> | undefined
   /**
    * Returns the automatically inferred aggregation function for the column.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#getautoaggregationfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/grouping)
    */
-  getAutoAggregationFn: () => AggregationFn<TData> | undefined
+  getAutoAggregationFn: () => AggregationFn<TData, TFeatures> | undefined
   /**
    * Returns whether or not the column can be grouped.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#getcangroup)
@@ -108,7 +121,7 @@ export interface GroupingColumn<TData extends RowData> {
   toggleGrouping: () => void
 }
 
-export interface GroupingRow {
+export interface ColumnGroupingRow {
   _groupingValuesCache: Record<string, any>
   /**
    * Returns the grouping value for any row and column (including leaf rows).
@@ -136,7 +149,7 @@ export interface GroupingRow {
   groupingValue?: unknown
 }
 
-export interface GroupingCell {
+export interface ColumnGroupingCell {
   /**
    * Returns whether or not the cell is currently aggregated.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#getisaggregated)
@@ -157,12 +170,15 @@ export interface GroupingCell {
   getIsPlaceholder: () => boolean
 }
 
-export interface ColumnDefaultOptions {
+export interface ColumnGroupingDefaultOptions {
   enableGrouping: boolean
-  onGroupingChange: OnChangeFn<GroupingState>
+  onGroupingChange: OnChangeFn<ColumnGroupingState>
 }
 
-interface GroupingOptionsBase {
+interface ColumnGroupingOptionsBase<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Enables/disables grouping for the table.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#enablegrouping)
@@ -174,7 +190,9 @@ interface GroupingOptionsBase {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#getgroupedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/grouping)
    */
-  getGroupedRowModel?: (table: Table<any>) => () => RowModel<any>
+  getGroupedRowModel?: (
+    table: Table<TData, TFeatures>
+  ) => () => RowModel<TData, TFeatures>
   /**
    * Grouping columns are automatically reordered by default to the start of the columns list. If you would rather remove them or leave them as-is, set the appropriate mode here.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#groupedcolumnmode)
@@ -192,37 +210,48 @@ interface GroupingOptionsBase {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#ongroupingchange)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/grouping)
    */
-  onGroupingChange?: OnChangeFn<GroupingState>
+  onGroupingChange?: OnChangeFn<ColumnGroupingState>
 }
 
-type ResolvedAggregationFns = keyof AggregationFns extends never
+type ResolvedAggregationFns<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> = keyof AggregationFns extends never
   ? {
-      aggregationFns?: Record<string, AggregationFn<any>>
+      aggregationFns?: Record<string, AggregationFn<TData, TFeatures>>
     }
   : {
-      aggregationFns: Record<keyof AggregationFns, AggregationFn<any>>
+      aggregationFns: Record<
+        keyof AggregationFns,
+        AggregationFn<TData, TFeatures>
+      >
     }
 
-export interface GroupingOptions
-  extends GroupingOptionsBase,
-    ResolvedAggregationFns {}
+export interface ColumnGroupingOptions<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> extends ColumnGroupingOptionsBase<TData, TFeatures>,
+    ResolvedAggregationFns<TData, TFeatures> {}
 
 export type GroupingColumnMode = false | 'reorder' | 'remove'
 
-export interface GroupingInstance<TData extends RowData> {
-  _getGroupedRowModel?: () => RowModel<TData>
+export interface ColumnGroupingInstance<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
+  _getGroupedRowModel?: () => RowModel<TData, TFeatures>
   /**
    * Returns the row model for the table after grouping has been applied.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#getgroupedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/grouping)
    */
-  getGroupedRowModel: () => RowModel<TData>
+  getGroupedRowModel: () => RowModel<TData, TFeatures>
   /**
    * Returns the row model for the table before any grouping has been applied.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#getpregroupedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/grouping)
    */
-  getPreGroupedRowModel: () => RowModel<TData>
+  getPreGroupedRowModel: () => RowModel<TData, TFeatures>
   /**
    * Resets the **grouping** state to `initialState.grouping`, or `true` can be passed to force a default blank state reset to `[]`.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#resetgrouping)
@@ -234,41 +263,48 @@ export interface GroupingInstance<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/grouping#setgrouping)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/grouping)
    */
-  setGrouping: (updater: Updater<GroupingState>) => void
+  setGrouping: (updater: Updater<ColumnGroupingState>) => void
 }
 
 //
 
 export const ColumnGrouping: TableFeature = {
-  getDefaultColumnDef: <TData extends RowData>(): GroupingColumnDef<
-    TData,
-    unknown
-  > => {
+  getDefaultColumnDef: <
+    TData extends RowData,
+    TFeatures extends TableFeatures = {},
+  >(): ColumnGroupingColumnDef<TData, unknown, TFeatures> => {
     return {
       aggregatedCell: props => (props.getValue() as any)?.toString?.() ?? null,
       aggregationFn: 'auto',
     }
   },
 
-  getInitialState: (state): GroupingTableState => {
+  getInitialState: (state): ColumnGroupingTableState => {
     return {
       grouping: [],
       ...state,
     }
   },
 
-  getDefaultOptions: <TData extends RowData>(
-    table: Table<TData>
-  ): GroupingOptions => {
+  getDefaultOptions: <
+    TData extends RowData,
+    TFeatures extends TableFeatures = {},
+  >(
+    table: Table<TData, TFeatures>
+  ): ColumnGroupingOptions<TData, TFeatures> => {
     return {
       onGroupingChange: makeStateUpdater('grouping', table),
       groupedColumnMode: 'reorder',
     }
   },
 
-  createColumn: <TData extends RowData, TValue>(
-    column: Column<TData, TValue>,
-    table: Table<TData>
+  createColumn: <
+    TData extends RowData,
+    TValue,
+    TFeatures extends TableFeatures = {},
+  >(
+    column: Column<TData, TValue, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     column.toggleGrouping = () => {
       table.setGrouping(old => {
@@ -334,7 +370,9 @@ export const ColumnGrouping: TableFeature = {
     }
   },
 
-  createTable: <TData extends RowData>(table: Table<TData>): void => {
+  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    table: Table<TData, TFeatures>
+  ): void => {
     table.setGrouping = updater => table.options.onGroupingChange?.(updater)
 
     table.resetGrouping = defaultState => {
@@ -355,9 +393,9 @@ export const ColumnGrouping: TableFeature = {
     }
   },
 
-  createRow: <TData extends RowData>(
-    row: Row<TData>,
-    table: Table<TData>
+  createRow: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    row: Row<TData, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     row.getIsGrouped = () => !!row.groupingColumnId
     row.getGroupingValue = columnId => {
@@ -380,11 +418,15 @@ export const ColumnGrouping: TableFeature = {
     row._groupingValuesCache = {}
   },
 
-  createCell: <TData extends RowData, TValue>(
-    cell: Cell<TData, TValue>,
-    column: Column<TData, TValue>,
-    row: Row<TData>,
-    table: Table<TData>
+  createCell: <
+    TData extends RowData,
+    TValue,
+    TFeatures extends TableFeatures = {},
+  >(
+    cell: Cell<TData, TValue, TFeatures>,
+    column: Column<TData, TValue, TFeatures>,
+    row: Row<TData, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     const getRenderValue = () =>
       cell.getValue() ?? table.options.renderFallbackValue
@@ -397,8 +439,11 @@ export const ColumnGrouping: TableFeature = {
   },
 }
 
-export function orderColumns<TData extends RowData>(
-  leafColumns: Column<TData, unknown>[],
+export function orderColumns<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(
+  leafColumns: Column<TData, unknown, TFeatures>[],
   grouping: string[],
   groupedColumnMode?: GroupingColumnMode
 ) {

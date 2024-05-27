@@ -2,9 +2,10 @@ import { createRow } from '../core/row'
 import { Table, Row, RowModel, RowData } from '../types'
 import { flattenBy, getMemoOptions, memo } from '../utils'
 
-export function getGroupedRowModel<TData extends RowData>(): (
-  table: Table<TData>
-) => () => RowModel<TData> {
+export function getGroupedRowModel<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(): (table: Table<TData, TFeatures>) => () => RowModel<TData, TFeatures> {
   return table =>
     memo(
       () => [table.getState().grouping, table.getPreGroupedRowModel()],
@@ -18,8 +19,8 @@ export function getGroupedRowModel<TData extends RowData>(): (
           table.getColumn(columnId)
         )
 
-        const groupedFlatRows: Row<TData>[] = []
-        const groupedRowsById: Record<string, Row<TData>> = {}
+        const groupedFlatRows: Row<TData, TFeatures>[] = []
+        const groupedRowsById: Record<string, Row<TData, TFeatures>> = {}
         // const onlyGroupedFlatRows: Row[] = [];
         // const onlyGroupedRowsById: Record<RowId, Row> = {};
         // const nonGroupedFlatRows: Row[] = [];
@@ -27,7 +28,7 @@ export function getGroupedRowModel<TData extends RowData>(): (
 
         // Recursively group the data
         const groupUpRecursively = (
-          rows: Row<TData>[],
+          rows: Row<TData, TFeatures>[],
           depth = 0,
           parentId?: string
         ) => {
@@ -165,8 +166,11 @@ export function getGroupedRowModel<TData extends RowData>(): (
     )
 }
 
-function groupBy<TData extends RowData>(rows: Row<TData>[], columnId: string) {
-  const groupMap = new Map<any, Row<TData>[]>()
+function groupBy<TData extends RowData, TFeatures extends TableFeatures = {}>(
+  rows: Row<TData, TFeatures>[],
+  columnId: string
+) {
+  const groupMap = new Map<any, Row<TData, TFeatures>[]>()
 
   return rows.reduce((map, row) => {
     const resKey = `${row.getGroupingValue(columnId)}`

@@ -1,4 +1,4 @@
-import { _getVisibleLeafColumns } from '..'
+import { TableFeatures, _getVisibleLeafColumns } from '..'
 import {
   RowData,
   Column,
@@ -74,7 +74,10 @@ export type ColumnSizingDefaultOptions = Pick<
   | 'columnResizeDirection'
 >
 
-export interface ColumnSizingInstance {
+export interface ColumnSizingInstance<
+  TData extends RowData,
+  TFeatures extends TableFeatures,
+> {
   /**
    * If pinning, returns the total size of the center portion of the table by calculating the sum of the sizes of all unpinned/center leaf-columns.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-sizing#getcentertotalsize)
@@ -243,8 +246,11 @@ export const ColumnSizing: TableFeature = {
     }
   },
 
-  getDefaultOptions: <TData extends RowData>(
-    table: Table<TData>
+  getDefaultOptions: <
+    TData extends RowData,
+    TFeatures extends TableFeatures = {},
+  >(
+    table: Table<TData, TFeatures>
   ): ColumnSizingDefaultOptions => {
     return {
       columnResizeMode: 'onEnd',
@@ -254,9 +260,13 @@ export const ColumnSizing: TableFeature = {
     }
   },
 
-  createColumn: <TData extends RowData, TValue>(
-    column: Column<TData, TValue>,
-    table: Table<TData>
+  createColumn: <
+    TData extends RowData,
+    TValue,
+    TFeatures extends TableFeatures = {},
+  >(
+    column: Column<TData, TValue, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     column.getSize = () => {
       const columnSize = table.getState().columnSizing[column.id]
@@ -312,14 +322,18 @@ export const ColumnSizing: TableFeature = {
     }
   },
 
-  createHeader: <TData extends RowData, TValue>(
-    header: Header<TData, TValue>,
-    table: Table<TData>
+  createHeader: <
+    TData extends RowData,
+    TValue,
+    TFeatures extends TableFeatures = {},
+  >(
+    header: Header<TData, TValue, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     header.getSize = () => {
       let sum = 0
 
-      const recurse = (header: Header<TData, TValue>) => {
+      const recurse = (header: Header<TData, TValue, TFeatures>) => {
         if (header.subHeaders.length) {
           header.subHeaders.forEach(recurse)
         } else {
@@ -513,7 +527,9 @@ export const ColumnSizing: TableFeature = {
     }
   },
 
-  createTable: <TData extends RowData>(table: Table<TData>): void => {
+  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    table: Table<TData, TFeatures>
+  ): void => {
     table.setColumnSizing = updater =>
       table.options.onColumnSizingChange?.(updater)
     table.setColumnSizingInfo = updater =>

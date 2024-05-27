@@ -3,9 +3,10 @@ import { Table, RowModel, Row, RowData } from '../types'
 import { getMemoOptions, memo } from '../utils'
 import { filterRows } from './filterRowsUtils'
 
-export function getFilteredRowModel<TData extends RowData>(): (
-  table: Table<TData>
-) => () => RowModel<TData> {
+export function getFilteredRowModel<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(): (table: Table<TData, TFeatures>) => () => RowModel<TData, TFeatures> {
   return table =>
     memo(
       () => [
@@ -25,8 +26,10 @@ export function getFilteredRowModel<TData extends RowData>(): (
           return rowModel
         }
 
-        const resolvedColumnFilters: ResolvedColumnFilter<TData>[] = []
-        const resolvedGlobalFilters: ResolvedColumnFilter<TData>[] = []
+        const resolvedColumnFilters: ResolvedColumnFilter<TData, TFeatures>[] =
+          []
+        const resolvedGlobalFilters: ResolvedColumnFilter<TData, TFeatures>[] =
+          []
 
         ;(columnFilters ?? []).forEach(d => {
           const column = table.getColumn(d.id)
@@ -131,7 +134,7 @@ export function getFilteredRowModel<TData extends RowData>(): (
           }
         }
 
-        const filterRowsImpl = (row: Row<TData>) => {
+        const filterRowsImpl = (row: Row<TData, TFeatures>) => {
           // Horizontally filter rows through each column
           for (let i = 0; i < filterableIds.length; i++) {
             if (row.columnFilters[filterableIds[i]!] === false) {

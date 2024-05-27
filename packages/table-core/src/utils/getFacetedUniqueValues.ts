@@ -1,8 +1,11 @@
 import { Table, RowData } from '../types'
 import { getMemoOptions, memo } from '../utils'
 
-export function getFacetedUniqueValues<TData extends RowData>(): (
-  table: Table<TData>,
+export function getFacetedUniqueValues<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(): (
+  table: Table<TData, TFeatures>,
   columnId: string
 ) => () => Map<any, number> {
   return (table, columnId) =>

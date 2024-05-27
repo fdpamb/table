@@ -1,9 +1,10 @@
 import { Table, Row, RowModel, RowData } from '../types'
 import { getMemoOptions, memo } from '../utils'
 
-export function getExpandedRowModel<TData extends RowData>(): (
-  table: Table<TData>
-) => () => RowModel<TData> {
+export function getExpandedRowModel<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(): (table: Table<TData, TFeatures>) => () => RowModel<TData, TFeatures> {
   return table =>
     memo(
       () => [
@@ -30,10 +31,13 @@ export function getExpandedRowModel<TData extends RowData>(): (
     )
 }
 
-export function expandRows<TData extends RowData>(rowModel: RowModel<TData>) {
-  const expandedRows: Row<TData>[] = []
+export function expandRows<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(rowModel: RowModel<TData, TFeatures>) {
+  const expandedRows: Row<TData, TFeatures>[] = []
 
-  const handleRow = (row: Row<TData>) => {
+  const handleRow = (row: Row<TData, TFeatures>) => {
     expandedRows.push(row)
 
     if (row.subRows?.length && row.getIsExpanded()) {

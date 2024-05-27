@@ -19,13 +19,16 @@ export interface RowPinningTableState {
   rowPinning: RowPinningState
 }
 
-export interface RowPinningOptions<TData extends RowData> {
+export interface RowPinningOptions<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Enables/disables row pinning for the table. Defaults to `true`.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-pinning#enablerowpinning)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-pinning)
    */
-  enableRowPinning?: boolean | ((row: Row<TData>) => boolean)
+  enableRowPinning?: boolean | ((row: Row<TData, TFeatures>) => boolean)
   /**
    * When `false`, pinned rows will not be visible if they are filtered or paginated out of the table. When `true`, pinned rows will always be visible regardless of filtering or pagination. Defaults to `true`.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-pinning#keeppinnedrows)
@@ -75,20 +78,23 @@ export interface RowPinningRow {
   ) => void
 }
 
-export interface RowPinningInstance<TData extends RowData> {
-  _getPinnedRows: (position: 'top' | 'bottom') => Row<TData>[]
+export interface RowPinningInstance<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
+  _getPinnedRows: (position: 'top' | 'bottom') => Row<TData, TFeatures>[]
   /**
    * Returns all bottom pinned rows.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-pinning#getbottomrows)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-pinning)
    */
-  getBottomRows: () => Row<TData>[]
+  getBottomRows: () => Row<TData, TFeatures>[]
   /**
    * Returns all rows that are not pinned to the top or bottom.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-pinning#getcenterrows)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-pinning)
    */
-  getCenterRows: () => Row<TData>[]
+  getCenterRows: () => Row<TData, TFeatures>[]
   /**
    * Returns whether or not any rows are pinned. Optionally specify to only check for pinned rows in either the `top` or `bottom` position.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-pinning#getissomerowspinned)
@@ -100,7 +106,7 @@ export interface RowPinningInstance<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-pinning#gettoprows)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-pinning)
    */
-  getTopRows: () => Row<TData>[]
+  getTopRows: () => Row<TData, TFeatures>[]
   /**
    * Resets the **rowPinning** state to `initialState.rowPinning`, or `true` can be passed to force a default blank state reset to `{ top: [], bottom: [], }`.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-pinning#resetrowpinning)
@@ -130,17 +136,20 @@ export const RowPinning: TableFeature = {
     }
   },
 
-  getDefaultOptions: <TData extends RowData>(
-    table: Table<TData>
+  getDefaultOptions: <
+    TData extends RowData,
+    TFeatures extends TableFeatures = {},
+  >(
+    table: Table<TData, TFeatures>
   ): RowPinningDefaultOptions => {
     return {
       onRowPinningChange: makeStateUpdater('rowPinning', table),
     }
   },
 
-  createRow: <TData extends RowData>(
-    row: Row<TData>,
-    table: Table<TData>
+  createRow: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    row: Row<TData, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     row.pin = (position, includeLeafRows, includeParentRows) => {
       const leafRowIds = includeLeafRows
@@ -207,7 +216,9 @@ export const RowPinning: TableFeature = {
     }
   },
 
-  createTable: <TData extends RowData>(table: Table<TData>): void => {
+  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    table: Table<TData, TFeatures>
+  ): void => {
     table.setRowPinning = updater => table.options.onRowPinningChange?.(updater)
 
     table.resetRowPinning = defaultState =>
@@ -246,9 +257,10 @@ export const RowPinning: TableFeature = {
                 rowId => visibleRows.find(row => row.id === rowId)!
               )
 
-        return rows
-          .filter(Boolean)
-          .map(d => ({ ...d, position })) as Row<TData>[]
+        return rows.filter(Boolean).map(d => ({ ...d, position })) as Row<
+          TData,
+          TFeatures
+        >[]
       },
       getMemoOptions(table.options, 'debugRows', '_getPinnedRows')
     )

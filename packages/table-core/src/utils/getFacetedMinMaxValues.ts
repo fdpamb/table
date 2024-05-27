@@ -1,8 +1,11 @@
 import { Table, RowData } from '../types'
 import { getMemoOptions, memo } from '../utils'
 
-export function getFacetedMinMaxValues<TData extends RowData>(): (
-  table: Table<TData>,
+export function getFacetedMinMaxValues<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(): (
+  table: Table<TData, TFeatures>,
   columnId: string
 ) => () => undefined | [number, number] {
   return (table, columnId) =>

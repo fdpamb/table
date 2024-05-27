@@ -1,4 +1,4 @@
-import { RowModel } from '..'
+import { RowModel, TableFeatures } from '..'
 import { BuiltInFilterFn, filterFns } from '../filterFns'
 import {
   Column,
@@ -13,7 +13,7 @@ import {
 } from '../types'
 import { functionalUpdate, isFunction, makeStateUpdater } from '../utils'
 
-export interface ColumnFiltersTableState {
+export interface ColumnFilteringTableState {
   columnFilters: ColumnFiltersState
 }
 
@@ -24,45 +24,53 @@ export interface ColumnFilter {
   value: unknown
 }
 
-export interface ResolvedColumnFilter<TData extends RowData> {
-  filterFn: FilterFn<TData>
+export interface ResolvedColumnFilter<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
+  filterFn: FilterFn<TData, TFeatures>
   id: string
   resolvedValue: unknown
 }
 
-export interface FilterFn<TData extends RowData> {
+export interface FilterFn<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   (
-    row: Row<TData>,
+    row: Row<TData, TFeatures>,
     columnId: string,
     filterValue: any,
     addMeta: (meta: FilterMeta) => void
   ): boolean
-  autoRemove?: ColumnFilterAutoRemoveTestFn<TData>
-  resolveFilterValue?: TransformFilterValueFn<TData>
+  autoRemove?: ColumnFilterAutoRemoveTestFn<TData, TFeatures>
+  resolveFilterValue?: TransformFilterValueFn<TData, TFeatures>
 }
 
-export type TransformFilterValueFn<TData extends RowData> = (
-  value: any,
-  column?: Column<TData, unknown>
-) => unknown
+export type TransformFilterValueFn<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> = (value: any, column?: Column<TData, unknown, TFeatures>) => unknown
 
-export type ColumnFilterAutoRemoveTestFn<TData extends RowData> = (
-  value: any,
-  column?: Column<TData, unknown>
-) => boolean
+export type ColumnFilterAutoRemoveTestFn<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> = (value: any, column?: Column<TData, unknown, TFeatures>) => boolean
 
-export type CustomFilterFns<TData extends RowData> = Record<
-  string,
-  FilterFn<TData>
->
+export type CustomFilterFns<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> = Record<string, FilterFn<TData, TFeatures>>
 
-export type FilterFnOption<TData extends RowData> =
-  | 'auto'
-  | BuiltInFilterFn
-  | keyof FilterFns
-  | FilterFn<TData>
+export type FilterFnOption<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> = 'auto' | BuiltInFilterFn | keyof FilterFns | FilterFn<TData, TFeatures>
 
-export interface ColumnFiltersColumnDef<TData extends RowData> {
+export interface ColumnFilteringColumnDef<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Enables/disables the **column** filter for this column.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#enablecolumnfilter)
@@ -74,16 +82,19 @@ export interface ColumnFiltersColumnDef<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#filterfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-filtering)
    */
-  filterFn?: FilterFnOption<TData>
+  filterFn?: FilterFnOption<TData, TFeatures>
 }
 
-export interface ColumnFiltersColumn<TData extends RowData> {
+export interface ColumnFilteringColumn<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Returns an automatically calculated filter function for the column based off of the columns first known value.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#getautofilterfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-filtering)
    */
-  getAutoFilterFn: () => FilterFn<TData> | undefined
+  getAutoFilterFn: () => FilterFn<TData, TFeatures> | undefined
   /**
    * Returns whether or not the column can be **column** filtered.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#getcanfilter)
@@ -95,7 +106,7 @@ export interface ColumnFiltersColumn<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#getfilterfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-filtering)
    */
-  getFilterFn: () => FilterFn<TData> | undefined
+  getFilterFn: () => FilterFn<TData, TFeatures> | undefined
   /**
    * Returns the index (including `-1`) of the column filter in the table's `state.columnFilters` array.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#getfilterindex)
@@ -122,7 +133,7 @@ export interface ColumnFiltersColumn<TData extends RowData> {
   setFilterValue: (updater: Updater<any>) => void
 }
 
-export interface ColumnFiltersRow<TData extends RowData> {
+export interface ColumnFiltersRow {
   /**
    * The column filters map for the row. This object tracks whether a row is passing/failing specific filters by their column ID.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#columnfilters)
@@ -137,7 +148,10 @@ export interface ColumnFiltersRow<TData extends RowData> {
   columnFiltersMeta: Record<string, FilterMeta>
 }
 
-interface ColumnFiltersOptionsBase<TData extends RowData> {
+interface ColumnFilteringOptionsBase<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Enables/disables **column** filtering for all columns.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#enablecolumnfilters)
@@ -163,7 +177,9 @@ interface ColumnFiltersOptionsBase<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#getfilteredrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-filtering)
    */
-  getFilteredRowModel?: (table: Table<any>) => () => RowModel<any>
+  getFilteredRowModel?: (
+    table: Table<TData, TFeatures>
+  ) => () => RowModel<TData, TFeatures>
   /**
    * Disables the `getFilteredRowModel` from being used to filter data. This may be useful if your table needs to dynamically support both client-side and server-side filtering.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#manualfiltering)
@@ -186,32 +202,40 @@ interface ColumnFiltersOptionsBase<TData extends RowData> {
   onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>
 }
 
-type ResolvedFilterFns = keyof FilterFns extends never
+type ResolvedFilterFns<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> = keyof FilterFns extends never
   ? {
-      filterFns?: Record<string, FilterFn<any>>
+      filterFns?: Record<string, FilterFn<TData, TFeatures>>
     }
   : {
-      filterFns: Record<keyof FilterFns, FilterFn<any>>
+      filterFns: Record<keyof FilterFns, FilterFn<TData, TFeatures>>
     }
 
-export interface ColumnFiltersOptions<TData extends RowData>
-  extends ColumnFiltersOptionsBase<TData>,
-    ResolvedFilterFns {}
+export interface ColumnFilteringOptions<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> extends ColumnFilteringOptionsBase<TData, TFeatures>,
+    ResolvedFilterFns<TData, TFeatures> {}
 
-export interface ColumnFiltersInstance<TData extends RowData> {
-  _getFilteredRowModel?: () => RowModel<TData>
+export interface ColumnFilteringInstance<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
+  _getFilteredRowModel?: () => RowModel<TData, TFeatures>
   /**
    * Returns the row model for the table after **column** filtering has been applied.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#getfilteredrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-filtering)
    */
-  getFilteredRowModel: () => RowModel<TData>
+  getFilteredRowModel: () => RowModel<TData, TFeatures>
   /**
    * Returns the row model for the table before any **column** filtering has been applied.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#getprefilteredrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-filtering)
    */
-  getPreFilteredRowModel: () => RowModel<TData>
+  getPreFilteredRowModel: () => RowModel<TData, TFeatures>
   /**
    * Resets the **columnFilters** state to `initialState.columnFilters`, or `true` can be passed to force a default blank state reset to `[]`.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-filtering#resetcolumnfilters)
@@ -243,32 +267,40 @@ export interface ColumnFiltersInstance<TData extends RowData> {
 export const ColumnFiltering: TableFeature = {
   getDefaultColumnDef: <
     TData extends RowData,
-  >(): ColumnFiltersColumnDef<TData> => {
+    TFeatures extends TableFeatures = {},
+  >(): ColumnFilteringColumnDef<TData, TFeatures> => {
     return {
       filterFn: 'auto',
     }
   },
 
-  getInitialState: (state): ColumnFiltersTableState => {
+  getInitialState: (state): ColumnFilteringTableState => {
     return {
       columnFilters: [],
       ...state,
     }
   },
 
-  getDefaultOptions: <TData extends RowData>(
-    table: Table<TData>
-  ): ColumnFiltersOptions<TData> => {
+  getDefaultOptions: <
+    TData extends RowData,
+    TFeatures extends TableFeatures = {},
+  >(
+    table: Table<TData, TFeatures>
+  ): ColumnFilteringOptions<TData, TFeatures> => {
     return {
       onColumnFiltersChange: makeStateUpdater('columnFilters', table),
       filterFromLeafRows: false,
       maxLeafRowFilterDepth: 100,
-    } as ColumnFiltersOptions<TData>
+    } as ColumnFilteringOptions<TData, TFeatures>
   },
 
-  createColumn: <TData extends RowData>(
-    column: Column<TData, unknown>,
-    table: Table<TData>
+  createColumn: <
+    TData extends RowData,
+    TValue,
+    TFeatures extends TableFeatures = {},
+  >(
+    column: Column<TData, unknown, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     column.getAutoFilterFn = () => {
       const firstRow = table.getCoreRowModel().flatRows[0]
@@ -335,7 +367,11 @@ export const ColumnFiltering: TableFeature = {
 
         //
         if (
-          shouldAutoRemoveFilter(filterFn as FilterFn<TData>, newFilter, column)
+          shouldAutoRemoveFilter(
+            filterFn as FilterFn<TData, TFeatures>,
+            newFilter,
+            column
+          )
         ) {
           return old?.filter(d => d.id !== column.id) ?? []
         }
@@ -362,15 +398,17 @@ export const ColumnFiltering: TableFeature = {
     }
   },
 
-  createRow: <TData extends RowData>(
-    row: Row<TData>,
-    _table: Table<TData>
+  createRow: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    row: Row<TData, TFeatures>,
+    _table: Table<TData, TFeatures>
   ): void => {
     row.columnFilters = {}
     row.columnFiltersMeta = {}
   },
 
-  createTable: <TData extends RowData>(table: Table<TData>): void => {
+  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    table: Table<TData, TFeatures>
+  ): void => {
     table.setColumnFilters = (updater: Updater<ColumnFiltersState>) => {
       const leafColumns = table.getAllLeafColumns()
 
@@ -414,10 +452,13 @@ export const ColumnFiltering: TableFeature = {
   },
 }
 
-export function shouldAutoRemoveFilter<TData extends RowData>(
-  filterFn?: FilterFn<TData>,
+export function shouldAutoRemoveFilter<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(
+  filterFn?: FilterFn<TData, TFeatures>,
   value?: any,
-  column?: Column<TData, unknown>
+  column?: Column<TData, unknown, TFeatures>
 ) {
   return (
     (filterFn && filterFn.autoRemove

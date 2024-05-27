@@ -15,28 +15,31 @@ export interface RowSelectionTableState {
   rowSelection: RowSelectionState
 }
 
-export interface RowSelectionOptions<TData extends RowData> {
+export interface RowSelectionOptions<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * - Enables/disables multiple row selection for all rows in the table OR
    * - A function that given a row, returns whether to enable/disable multiple row selection for that row's children/grandchildren
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-selection#enablemultirowselection)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-selection)
    */
-  enableMultiRowSelection?: boolean | ((row: Row<TData>) => boolean)
+  enableMultiRowSelection?: boolean | ((row: Row<TData, TFeatures>) => boolean)
   /**
    * - Enables/disables row selection for all rows in the table OR
    * - A function that given a row, returns whether to enable/disable row selection for that row
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-selection#enablerowselection)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-selection)
    */
-  enableRowSelection?: boolean | ((row: Row<TData>) => boolean)
+  enableRowSelection?: boolean | ((row: Row<TData, TFeatures>) => boolean)
   /**
    * Enables/disables automatic sub-row selection when a parent row is selected, or a function that enables/disables automatic sub-row selection for each row.
    * (Use in combination with expanding or grouping features)
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-selection#enablesubrowselection)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-selection)
    */
-  enableSubRowSelection?: boolean | ((row: Row<TData>) => boolean)
+  enableSubRowSelection?: boolean | ((row: Row<TData, TFeatures>) => boolean)
   /**
    * If provided, this function will be called with an `updaterFn` when `state.rowSelection` changes. This overrides the default internal state management, so you will need to persist the state change either fully or partially outside of the table.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-selection#onrowselectionchange)
@@ -46,14 +49,14 @@ export interface RowSelectionOptions<TData extends RowData> {
   // enableGroupingRowSelection?:
   //   | boolean
   //   | ((
-  //       row: Row<TData>
+  //       row: Row<TData, TFeatures>
   //     ) => boolean)
   // isAdditiveSelectEvent?: (e: unknown) => boolean
   // isInclusiveSelectEvent?: (e: unknown) => boolean
   // selectRowsFn?: (
-  //   table: Table<TData>,
-  //   rowModel: RowModel<TData>
-  // ) => RowModel<TData>
+  //   table: Table<TData, TFeatures>,
+  //   rowModel: RowModel<TData, TFeatures>
+  // ) => RowModel<TData, TFeatures>
 }
 
 export interface RowSelectionRow {
@@ -107,19 +110,22 @@ export interface RowSelectionRow {
   toggleSelected: (value?: boolean, opts?: { selectChildren?: boolean }) => void
 }
 
-export interface RowSelectionInstance<TData extends RowData> {
+export interface RowSelectionInstance<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+> {
   /**
    * Returns the row model of all rows that are selected after filtering has been applied.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-selection#getfilteredselectedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-selection)
    */
-  getFilteredSelectedRowModel: () => RowModel<TData>
+  getFilteredSelectedRowModel: () => RowModel<TData, TFeatures>
   /**
    * Returns the row model of all rows that are selected after grouping has been applied.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-selection#getgroupedselectedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-selection)
    */
-  getGroupedSelectedRowModel: () => RowModel<TData>
+  getGroupedSelectedRowModel: () => RowModel<TData, TFeatures>
   /**
    * Returns whether or not all rows on the current page are selected.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-selection#getisallpagerowsselected)
@@ -149,13 +155,13 @@ export interface RowSelectionInstance<TData extends RowData> {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-selection#getpreselectedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-selection)
    */
-  getPreSelectedRowModel: () => RowModel<TData>
+  getPreSelectedRowModel: () => RowModel<TData, TFeatures>
   /**
    * Returns the row model of all rows that are selected.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-selection#getselectedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/row-selection)
    */
-  getSelectedRowModel: () => RowModel<TData>
+  getSelectedRowModel: () => RowModel<TData, TFeatures>
   /**
    * Returns a handler that can be used to toggle all rows on the current page.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/row-selection#gettoggleallpagerowsselectedhandler)
@@ -204,9 +210,12 @@ export const RowSelection: TableFeature = {
     }
   },
 
-  getDefaultOptions: <TData extends RowData>(
-    table: Table<TData>
-  ): RowSelectionOptions<TData> => {
+  getDefaultOptions: <
+    TData extends RowData,
+    TFeatures extends TableFeatures = {},
+  >(
+    table: Table<TData, TFeatures>
+  ): RowSelectionOptions<TData, TFeatures> => {
     return {
       onRowSelectionChange: makeStateUpdater('rowSelection', table),
       enableRowSelection: true,
@@ -218,7 +227,9 @@ export const RowSelection: TableFeature = {
     }
   },
 
-  createTable: <TData extends RowData>(table: Table<TData>): void => {
+  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    table: Table<TData, TFeatures>
+  ): void => {
     table.setRowSelection = updater =>
       table.options.onRowSelectionChange?.(updater)
     table.resetRowSelection = defaultState =>
@@ -466,9 +477,9 @@ export const RowSelection: TableFeature = {
     }
   },
 
-  createRow: <TData extends RowData>(
-    row: Row<TData>,
-    table: Table<TData>
+  createRow: <TData extends RowData, TFeatures extends TableFeatures = {}>(
+    row: Row<TData, TFeatures>,
+    table: Table<TData, TFeatures>
   ): void => {
     row.toggleSelected = (value, opts) => {
       const isSelected = row.getIsSelected()
@@ -544,12 +555,15 @@ export const RowSelection: TableFeature = {
   },
 }
 
-const mutateRowIsSelected = <TData extends RowData>(
+const mutateRowIsSelected = <
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(
   selectedRowIds: Record<string, boolean>,
   id: string,
   value: boolean,
   includeChildren: boolean,
-  table: Table<TData>
+  table: Table<TData, TFeatures>
 ) => {
   const row = table.getRow(id, true)
 
@@ -578,17 +592,23 @@ const mutateRowIsSelected = <TData extends RowData>(
   }
 }
 
-export function selectRowsFn<TData extends RowData>(
-  table: Table<TData>,
-  rowModel: RowModel<TData>
-): RowModel<TData> {
+export function selectRowsFn<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(
+  table: Table<TData, TFeatures>,
+  rowModel: RowModel<TData, TFeatures>
+): RowModel<TData, TFeatures> {
   const rowSelection = table.getState().rowSelection
 
-  const newSelectedFlatRows: Row<TData>[] = []
-  const newSelectedRowsById: Record<string, Row<TData>> = {}
+  const newSelectedFlatRows: Row<TData, TFeatures>[] = []
+  const newSelectedRowsById: Record<string, Row<TData, TFeatures>> = {}
 
   // Filters top level and nested rows
-  const recurseRows = (rows: Row<TData>[], depth = 0): Row<TData>[] => {
+  const recurseRows = (
+    rows: Row<TData, TFeatures>[],
+    depth = 0
+  ): Row<TData, TFeatures>[] => {
     return rows
       .map(row => {
         const isSelected = isRowSelected(row, rowSelection)
@@ -609,7 +629,7 @@ export function selectRowsFn<TData extends RowData>(
           return row
         }
       })
-      .filter(Boolean) as Row<TData>[]
+      .filter(Boolean) as Row<TData, TFeatures>[]
   }
 
   return {
@@ -619,17 +639,20 @@ export function selectRowsFn<TData extends RowData>(
   }
 }
 
-export function isRowSelected<TData extends RowData>(
-  row: Row<TData>,
-  selection: Record<string, boolean>
-): boolean {
+export function isRowSelected<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(row: Row<TData, TFeatures>, selection: Record<string, boolean>): boolean {
   return selection[row.id] ?? false
 }
 
-export function isSubRowSelected<TData extends RowData>(
-  row: Row<TData>,
+export function isSubRowSelected<
+  TData extends RowData,
+  TFeatures extends TableFeatures = {},
+>(
+  row: Row<TData, TFeatures>,
   selection: Record<string, boolean>,
-  table: Table<TData>
+  table: Table<TData, TFeatures>
 ): boolean | 'some' | 'all' {
   if (!row.subRows?.length) return false
 

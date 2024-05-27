@@ -8,12 +8,13 @@ import {
   ColumnDef,
   ColumnFiltersState,
   RowData,
+  RowExpanding,
+  createReactTableFactory,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
 } from '@tanstack/react-table'
 
 import { makeData, Person } from './makeData'
@@ -85,18 +86,23 @@ function App() {
   const [data, setData] = React.useState<Person[]>(() => makeData(5_000))
   const refreshData = () => setData(_old => makeData(50_000)) //stress test
 
-  const table = useReactTable({
+  const tableFactory = createReactTableFactory<Person>({
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(), //client side filtering
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  })
+
+  const table = tableFactory.useReactTable({
+    _features: { RowExpanding },
     data,
     columns,
     filterFns: {},
     state: {
       columnFilters,
     },
-    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(), //client side filtering
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    onColumnFiltersChange: setColumnFilters,
     debugTable: true,
     debugHeaders: true,
     debugColumns: false,
