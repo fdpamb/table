@@ -268,13 +268,13 @@ export interface CoreInstance<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/table#getstate)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/tables)
    */
-  getState: () => TableState<TData, TFeatures>
+  getState: () => TableState<TFeatures>
   /**
    * This is the resolved initial state of the table.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/table#initialstate)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/tables)
    */
-  initialState: TableState<TData, TFeatures>
+  initialState: TableState<TFeatures>
   /**
    * A read-only reference to the table's current options.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/table#options)
@@ -343,11 +343,11 @@ export function createTable<
   let initialState = {
     ...coreInitialState,
     ...(options.initialState ?? {}),
-  } as TableState<TData, TFeatures>
+  } as TableState<TFeatures>
 
   featuresArray.forEach(feature => {
     initialState = (feature.getInitialState?.(initialState) ??
-      initialState) as TableState<TData, TFeatures>
+      initialState) as TableState<TFeatures>
   })
 
   const queued: (() => void)[] = []
@@ -394,7 +394,7 @@ export function createTable<
     },
 
     getState: () => {
-      return table.options.state as TableState<TData, TFeatures>
+      return table.options.state as TableState<TFeatures>
     },
 
     setState: (updater: Updater<TableState<TFeatures>>) => {

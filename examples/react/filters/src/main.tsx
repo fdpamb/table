@@ -8,7 +8,9 @@ import {
   ColumnDef,
   ColumnFiltersState,
   RowData,
+  ColumnFiltering,
   RowExpanding,
+  RowSorting,
   createReactTableFactory,
   flexRender,
   getCoreRowModel,
@@ -94,7 +96,7 @@ function App() {
   })
 
   const table = tableFactory.useReactTable({
-    _features: { RowExpanding },
+    _features: { ColumnFiltering, RowSorting },
     data,
     columns,
     filterFns: {},
@@ -107,6 +109,12 @@ function App() {
     debugHeaders: true,
     debugColumns: false,
   })
+
+  //shows up because of RowSorting defined as _feature
+  console.log(table.getState().sorting) 
+
+  //will not be present if RowExpanding is not defined as _feature
+  console.log(table.getState().expanded) 
 
   return (
     <div className="p-2">

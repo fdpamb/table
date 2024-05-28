@@ -197,77 +197,83 @@ export type AnyRender = (Comp: any, props: any) => any
 export type Table<
   TData extends RowData,
   TFeatures extends TableFeatures = {},
-> = CoreInstance<TData, TFeatures> &
-  HeadersInstance<TData, TFeatures> &
-  ('ColumnFiltering' extends keyof TFeatures
-    ? ColumnFilteringInstance<TData, TFeatures>
-    : {}) &
-  ('ColumnGrouping' extends keyof TFeatures
-    ? ColumnGroupingInstance<TData, TFeatures>
-    : {}) &
-  ('ColumnOrdering' extends keyof TFeatures
-    ? ColumnOrderInstance<TData, TFeatures>
-    : {}) &
-  ('ColumnPinning' extends keyof TFeatures
-    ? ColumnPinningInstance<TData, TFeatures>
-    : {}) &
-  ('ColumnSizing' extends keyof TFeatures
-    ? ColumnSizingInstance<TData, TFeatures>
-    : {}) &
-  ('ColumnVisibility' extends keyof TFeatures
-    ? ColumnVisibilityInstance<TData, TFeatures>
-    : {}) &
-  ('GlobalFiltering' extends keyof TFeatures
-    ? GlobalFilterInstance<TData, TFeatures>
-    : {}) &
-  ('RowExpanding' extends keyof TFeatures
-    ? ExpandedInstance<TData, TFeatures>
-    : {}) &
-  ('RowPagination' extends keyof TFeatures
-    ? PaginationInstance<TData, TFeatures>
-    : {}) &
-  ('RowPinning' extends keyof TFeatures
-    ? RowPinningInstance<TData, TFeatures>
-    : {}) &
-  ('RowSelection' extends keyof TFeatures
-    ? RowSelectionInstance<TData, TFeatures>
-    : {}) &
-  ('RowSorting' extends keyof TFeatures
-    ? SortingInstance<TData, TFeatures>
-    : {})
+> = UnionToIntersection<
+  | CoreInstance<TData, TFeatures>
+  | HeadersInstance<TData, TFeatures>
+  | ('ColumnFiltering' extends keyof TFeatures
+      ? ColumnFilteringInstance<TData, TFeatures>
+      : never)
+  | ('ColumnGrouping' extends keyof TFeatures
+      ? ColumnGroupingInstance<TData, TFeatures>
+      : never)
+  | ('ColumnOrdering' extends keyof TFeatures
+      ? ColumnOrderInstance<TData, TFeatures>
+      : never)
+  | ('ColumnPinning' extends keyof TFeatures
+      ? ColumnPinningInstance<TData, TFeatures>
+      : never)
+  | ('ColumnSizing' extends keyof TFeatures
+      ? ColumnSizingInstance<TData, TFeatures>
+      : never)
+  | ('ColumnVisibility' extends keyof TFeatures
+      ? ColumnVisibilityInstance<TData, TFeatures>
+      : never)
+  | ('GlobalFiltering' extends keyof TFeatures
+      ? GlobalFilterInstance<TData, TFeatures>
+      : never)
+  | ('RowExpanding' extends keyof TFeatures
+      ? ExpandedInstance<TData, TFeatures>
+      : never)
+  | ('RowPagination' extends keyof TFeatures
+      ? PaginationInstance<TData, TFeatures>
+      : never)
+  | ('RowPinning' extends keyof TFeatures
+      ? RowPinningInstance<TData, TFeatures>
+      : never)
+  | ('RowSelection' extends keyof TFeatures
+      ? RowSelectionInstance<TData, TFeatures>
+      : never)
+  | ('RowSorting' extends keyof TFeatures
+      ? SortingInstance<TData, TFeatures>
+      : never)
+>
 
 export type TableOptionsResolved<
   TData extends RowData,
   TFeatures extends TableFeatures = {},
-> = CoreOptions<TData, TFeatures> &
-  CoreRowModelOptions<TData, TFeatures> &
-  ('ColumnFaceting' extends keyof TFeatures
-    ? ColumnFacetingOptions<TData, TFeatures>
-    : {}) &
-  ('ColumnFiltering' extends keyof TFeatures
-    ? ColumnFilteringOptions<TData, TFeatures>
-    : {}) &
-  ('ColumnGrouping' extends keyof TFeatures
-    ? ColumnGroupingOptions<TData, TFeatures>
-    : {}) &
-  ('ColumnOrdering' extends keyof TFeatures ? ColumnOrderOptions : {}) &
-  ('ColumnPinning' extends keyof TFeatures ? ColumnPinningOptions : {}) &
-  ('ColumnSizing' extends keyof TFeatures ? ColumnSizingOptions : {}) &
-  ('ColumnVisibility' extends keyof TFeatures ? VisibilityOptions : {}) &
-  ('GlobalFiltering' extends keyof TFeatures
-    ? GlobalFilterOptions<TData, TFeatures>
-    : {}) &
-  ('RowExpanding' extends keyof TFeatures
-    ? ExpandedOptions<TData, TFeatures>
-    : {}) &
-  ('RowPagination' extends keyof TFeatures ? PaginationOptions : {}) &
-  ('RowPinning' extends keyof TFeatures
-    ? RowPinningOptions<TData, TFeatures>
-    : {}) &
-  ('RowSelection' extends keyof TFeatures
-    ? RowSelectionOptions<TData, TFeatures>
-    : {}) &
-  ('RowSorting' extends keyof TFeatures ? SortingOptions<TData, TFeatures> : {})
+> = UnionToIntersection<
+  | CoreOptions<TData, TFeatures>
+  | CoreRowModelOptions<TData, TFeatures>
+  | ('ColumnFaceting' extends keyof TFeatures
+      ? ColumnFacetingOptions<TData, TFeatures>
+      : never)
+  | ('ColumnFiltering' extends keyof TFeatures
+      ? ColumnFilteringOptions<TData, TFeatures>
+      : never)
+  | ('ColumnGrouping' extends keyof TFeatures
+      ? ColumnGroupingOptions<TData, TFeatures>
+      : never)
+  | ('ColumnOrdering' extends keyof TFeatures ? ColumnOrderOptions : never)
+  | ('ColumnPinning' extends keyof TFeatures ? ColumnPinningOptions : never)
+  | ('ColumnSizing' extends keyof TFeatures ? ColumnSizingOptions : never)
+  | ('ColumnVisibility' extends keyof TFeatures ? VisibilityOptions : never)
+  | ('GlobalFiltering' extends keyof TFeatures
+      ? GlobalFilterOptions<TData, TFeatures>
+      : never)
+  | ('RowExpanding' extends keyof TFeatures
+      ? ExpandedOptions<TData, TFeatures>
+      : never)
+  | ('RowPagination' extends keyof TFeatures ? PaginationOptions : never)
+  | ('RowPinning' extends keyof TFeatures
+      ? RowPinningOptions<TData, TFeatures>
+      : never)
+  | ('RowSelection' extends keyof TFeatures
+      ? RowSelectionOptions<TData, TFeatures>
+      : never)
+  | ('RowSorting' extends keyof TFeatures
+      ? SortingOptions<TData, TFeatures>
+      : never)
+>
 
 export type TableOptions<
   TData extends RowData,
@@ -278,36 +284,48 @@ export type TableOptions<
 >
 
 export type TableState<TFeatures extends TableFeatures = {}> =
-  ('ColumnFiltering' extends keyof TFeatures ? ColumnFilteringTableState : {}) &
-    ('ColumnGrouping' extends keyof TFeatures ? ColumnGroupingTableState : {}) &
-    ('ColumnOrdering' extends keyof TFeatures ? ColumnOrderTableState : {}) &
-    ('ColumnPinning' extends keyof TFeatures ? ColumnPinningTableState : {}) &
-    ('ColumnSizing' extends keyof TFeatures ? ColumnSizingTableState : {}) &
-    ('ColumnVisibility' extends keyof TFeatures
-      ? ColumnVisibilityTableState
-      : {}) &
-    ('GlobalFiltering' extends keyof TFeatures ? GlobalFilterTableState : {}) &
-    ('RowExpanding' extends keyof TFeatures ? ExpandedTableState : {}) &
-    ('RowPagination' extends keyof TFeatures ? PaginationTableState : {}) &
-    ('RowPinning' extends keyof TFeatures ? RowPinningTableState : {}) &
-    ('RowSelection' extends keyof TFeatures ? RowSelectionTableState : {}) &
-    ('RowSorting' extends keyof TFeatures ? SortingTableState : {})
+  UnionToIntersection<
+    | ('ColumnFiltering' extends keyof TFeatures
+        ? ColumnFilteringTableState
+        : never)
+    | ('ColumnGrouping' extends keyof TFeatures
+        ? ColumnGroupingTableState
+        : never)
+    | ('ColumnOrdering' extends keyof TFeatures ? ColumnOrderTableState : never)
+    | ('ColumnPinning' extends keyof TFeatures
+        ? ColumnPinningTableState
+        : never)
+    | ('ColumnSizing' extends keyof TFeatures ? ColumnSizingTableState : never)
+    | ('ColumnVisibility' extends keyof TFeatures
+        ? ColumnVisibilityTableState
+        : never)
+    | ('GlobalFiltering' extends keyof TFeatures
+        ? GlobalFilterTableState
+        : never)
+    | ('RowExpanding' extends keyof TFeatures ? ExpandedTableState : never)
+    | ('RowPagination' extends keyof TFeatures ? PaginationTableState : never)
+    | ('RowPinning' extends keyof TFeatures ? RowPinningTableState : never)
+    | ('RowSelection' extends keyof TFeatures ? RowSelectionTableState : never)
+    | ('RowSorting' extends keyof TFeatures ? SortingTableState : never)
+  >
 
 export type Row<
   TData extends RowData,
   TFeatures extends TableFeatures = {},
-> = CoreRow<TData, TFeatures> &
-  ('ColumnFiltering' extends keyof TFeatures ? ColumnFiltersRow : {}) &
-  ('ColumnGrouping' extends keyof TFeatures ? ColumnGroupingRow : {}) &
-  ('ColumnPinning' extends keyof TFeatures
-    ? ColumnPinningRow<TData, TFeatures>
-    : {}) &
-  ('ColumnVisibility' extends keyof TFeatures
-    ? VisibilityRow<TData, TFeatures>
-    : {}) &
-  ('RowExpanding' extends keyof TFeatures ? ExpandedRow : {}) &
-  ('RowPinning' extends keyof TFeatures ? RowPinningRow : {}) &
-  ('RowSelection' extends keyof TFeatures ? RowSelectionRow : {})
+> = UnionToIntersection<
+  | CoreRow<TData, TFeatures>
+  | ('ColumnFiltering' extends keyof TFeatures ? ColumnFiltersRow : never)
+  | ('ColumnGrouping' extends keyof TFeatures ? ColumnGroupingRow : never)
+  | ('ColumnPinning' extends keyof TFeatures
+      ? ColumnPinningRow<TData, TFeatures>
+      : never)
+  | ('ColumnVisibility' extends keyof TFeatures
+      ? VisibilityRow<TData, TFeatures>
+      : never)
+  | ('RowExpanding' extends keyof TFeatures ? ExpandedRow : never)
+  | ('RowPinning' extends keyof TFeatures ? RowPinningRow : never)
+  | ('RowSelection' extends keyof TFeatures ? RowSelectionRow : never)
+>
 
 export interface RowModel<
   TData extends RowData,
@@ -359,21 +377,23 @@ type ColumnDefExtensions<
   TData extends RowData,
   TValue = unknown,
   TFeatures extends TableFeatures = {},
-> = ('ColumnVisibility' extends keyof TFeatures
-  ? ColumnVisibilityColumnDef
-  : {}) &
-  ('ColumnPinning' extends keyof TFeatures ? ColumnPinningColumnDef : {}) &
-  ('ColumnFiltering' extends keyof TFeatures
-    ? ColumnFilteringColumnDef<TData, TFeatures>
-    : {}) &
-  ('GlobalFiltering' extends keyof TFeatures ? GlobalFilterColumnDef : {}) &
-  ('RowSorting' extends keyof TFeatures
-    ? SortingColumnDef<TData, TFeatures>
-    : {}) &
-  ('ColumnGrouping' extends keyof TFeatures
-    ? ColumnGroupingColumnDef<TData, TValue, TFeatures>
-    : {}) &
-  ('ColumnSizing' extends keyof TFeatures ? ColumnSizingColumnDef : {})
+> = UnionToIntersection<
+  | ('ColumnVisibility' extends keyof TFeatures
+      ? ColumnVisibilityColumnDef
+      : never)
+  | ('ColumnPinning' extends keyof TFeatures ? ColumnPinningColumnDef : never)
+  | ('ColumnFiltering' extends keyof TFeatures
+      ? ColumnFilteringColumnDef<TData, TFeatures>
+      : never)
+  | ('GlobalFiltering' extends keyof TFeatures ? GlobalFilterColumnDef : never)
+  | ('RowSorting' extends keyof TFeatures
+      ? SortingColumnDef<TData, TFeatures>
+      : never)
+  | ('ColumnGrouping' extends keyof TFeatures
+      ? ColumnGroupingColumnDef<TData, TValue, TFeatures>
+      : never)
+  | ('ColumnSizing' extends keyof TFeatures ? ColumnSizingColumnDef : never)
+>
 
 export type ColumnDefBase<
   TData extends RowData,
@@ -481,36 +501,46 @@ export type Column<
   TData extends RowData,
   TValue = unknown,
   TFeatures extends TableFeatures = {},
-> = CoreColumn<TData, TValue, TFeatures> &
-  ('ColumnFaceting' extends keyof TFeatures
-    ? ColumnFacetingColumn<TData, TFeatures>
-    : {}) &
-  ('ColumnFiltering' extends keyof TFeatures
-    ? ColumnFilteringColumn<TData, TFeatures>
-    : {}) &
-  ('ColumnGrouping' extends keyof TFeatures
-    ? ColumnGroupingColumn<TData, TFeatures>
-    : {}) &
-  ('ColumnOrdering' extends keyof TFeatures ? ColumnOrderColumn : {}) &
-  ('ColumnPinning' extends keyof TFeatures ? ColumnPinningColumn : {}) &
-  ('ColumnSizing' extends keyof TFeatures ? ColumnSizingColumn : {}) &
-  ('ColumnVisibility' extends keyof TFeatures ? ColumnVisibilityColumn : {}) &
-  ('GlobalFiltering' extends keyof TFeatures ? GlobalFilterColumn : {}) &
-  ('RowSorting' extends keyof TFeatures ? SortingColumn<TData, TFeatures> : {})
+> = UnionToIntersection<
+  | CoreColumn<TData, TValue, TFeatures>
+  | ('ColumnFaceting' extends keyof TFeatures
+      ? ColumnFacetingColumn<TData, TFeatures>
+      : never)
+  | ('ColumnFiltering' extends keyof TFeatures
+      ? ColumnFilteringColumn<TData, TFeatures>
+      : never)
+  | ('ColumnGrouping' extends keyof TFeatures
+      ? ColumnGroupingColumn<TData, TFeatures>
+      : never)
+  | ('ColumnOrdering' extends keyof TFeatures ? ColumnOrderColumn : never)
+  | ('ColumnPinning' extends keyof TFeatures ? ColumnPinningColumn : never)
+  | ('ColumnSizing' extends keyof TFeatures ? ColumnSizingColumn : never)
+  | ('ColumnVisibility' extends keyof TFeatures
+      ? ColumnVisibilityColumn
+      : never)
+  | ('GlobalFiltering' extends keyof TFeatures ? GlobalFilterColumn : never)
+  | ('RowSorting' extends keyof TFeatures
+      ? SortingColumn<TData, TFeatures>
+      : never)
+>
 
 export type Cell<
   TData extends RowData,
   TValue,
   TFeatures extends TableFeatures = {},
-> = CoreCell<TData, TValue, TFeatures> &
-  ('ColumnGrouping' extends keyof TFeatures ? ColumnGroupingCell : {})
+> = UnionToIntersection<
+  | CoreCell<TData, TValue, TFeatures>
+  | ('ColumnGrouping' extends keyof TFeatures ? ColumnGroupingCell : never)
+>
 
 export type Header<
   TData extends RowData,
   TValue,
   TFeatures extends TableFeatures = {},
-> = CoreHeader<TData, TValue, TFeatures> &
-  ('ColumnSizing' extends keyof TFeatures ? ColumnSizingHeader : {})
+> = UnionToIntersection<
+  | CoreHeader<TData, TValue, TFeatures>
+  | ('ColumnSizing' extends keyof TFeatures ? ColumnSizingHeader : never)
+>
 
 export interface HeaderGroup<
   TData extends RowData,
