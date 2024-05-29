@@ -5,6 +5,7 @@ import {
   ColumnDef,
   RowData,
   ColumnDefResolved,
+  TableFeatures,
 } from '../types'
 import { getMemoOptions, memo } from '../utils'
 
@@ -18,7 +19,7 @@ export interface CoreColumn<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/column#accessorfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-defs)
    */
-  accessorFn?: AccessorFn<TData, TValue, TFeatures>
+  accessorFn?: AccessorFn<TData, TValue>
   /**
    * The original column def used to create the column.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/column#columndef)
@@ -81,7 +82,7 @@ export function createColumn<
   const resolvedColumnDef = {
     ...defaultColumn,
     ...columnDef,
-  } as ColumnDefResolved<TData, TFeatures>
+  } as ColumnDefResolved<TData, TValue, TFeatures>
 
   const accessorKey = resolvedColumnDef.accessorKey
 
@@ -92,7 +93,7 @@ export function createColumn<
       ? resolvedColumnDef.header
       : undefined)
 
-  let accessorFn: AccessorFn<TData, TFeatures> | undefined
+  let accessorFn: AccessorFn<TData, TValue> | undefined
 
   if (resolvedColumnDef.accessorFn) {
     accessorFn = resolvedColumnDef.accessorFn
@@ -164,9 +165,9 @@ export function createColumn<
     ),
   }
 
-  for (const feature of table._features) {
+  Object.values(table._features).forEach(feature => {
     feature.createColumn?.(column as Column<TData, TValue, TFeatures>, table)
-  }
+  })
 
   // Yes, we have to convert table to unknown, because we know more than the compiler here.
   return column as Column<TData, TValue, TFeatures>

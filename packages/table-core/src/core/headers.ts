@@ -5,9 +5,9 @@ import {
   HeaderGroup,
   Table,
   TableFeature,
+  TableFeatures,
 } from '../types'
 import { getMemoOptions, memo } from '../utils'
-import { TableFeatures } from './table'
 
 const debug = 'debugHeaders'
 
@@ -274,7 +274,7 @@ function createHeader<
     }),
   }
 
-  table._features.forEach(feature => {
+  Object.values(table._features).forEach(feature => {
     feature.createHeader?.(header as Header<TData, TValue, TFeatures>, table)
   })
 

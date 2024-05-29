@@ -14,7 +14,6 @@ import {
   TableMeta,
   ColumnDefResolved,
   GroupColumnDef,
-  TableFeature,
   TableFeatures,
 } from '../types'
 

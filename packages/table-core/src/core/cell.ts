@@ -1,4 +1,4 @@
-import { RowData, Cell, Column, Row, Table } from '../types'
+import { RowData, Cell, Column, Row, Table, TableFeatures } from '../types'
 import { Getter, getMemoOptions, memo } from '../utils'
 
 export interface CellContext<
@@ -90,11 +90,11 @@ export function createCell<
     ),
   }
 
-  table._features.forEach(feature => {
+  Object.values(table._features).forEach(feature => {
     feature.createCell?.(
       cell as Cell<TData, TValue, TFeatures>,
       column,
-      row as Row<TData, TFeatures>,
+      row,
       table
     )
   }, {})

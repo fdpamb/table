@@ -1,4 +1,4 @@
-import { RowData, Cell, Row, Table } from '../types'
+import { RowData, Cell, Row, Table, TableFeatures } from '../types'
 import { flattenBy, getMemoOptions, memo } from '../utils'
 import { createCell } from './cell'
 
@@ -203,10 +203,9 @@ export const createRow = <
     ),
   }
 
-  for (let i = 0; i < table._features.length; i++) {
-    const feature = table._features[i]
-    feature?.createRow?.(row as Row<TData, TFeatures>, table)
-  }
+  Object.values(table._features).forEach(feature => {
+    feature.createRow?.(row as Row<TData, TFeatures>, table)
+  })
 
   return row as Row<TData, TFeatures>
 }
