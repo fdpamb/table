@@ -5,6 +5,7 @@ import {
   Updater,
   RowData,
   TableFeature,
+  TableFeatures,
 } from '../types'
 import {
   functionalUpdate,
@@ -26,7 +27,10 @@ export interface PaginationInitialTableState {
   pagination?: Partial<PaginationState>
 }
 
-export interface PaginationOptions {
+export interface PaginationOptions<
+  TFeatures extends TableFeatures,
+  TData extends RowData,
+> {
   /**
    * If set to `true`, pagination will be reset to the first page when page-altering state changes eg. `data` is updated, filters change, grouping changes, etc.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#autoresetpageindex)
@@ -40,7 +44,9 @@ export interface PaginationOptions {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#getpaginationrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/pagination)
    */
-  getPaginationRowModel?: (table: Table<any>) => () => RowModel<any>
+  getPaginationRowModel?: (
+    table: Table<TFeatures, TData>
+  ) => () => RowModel<TFeatures, TData>
   /**
    * Enables manual pagination. If this option is set to `true`, the table will not automatically paginate rows using `getPaginationRowModel()` and instead will expect you to manually paginate the rows before passing them to the table. This is useful if you are doing server-side pagination and aggregation.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#manualpagination)
@@ -72,11 +78,11 @@ export interface PaginationDefaultOptions {
 }
 
 export interface PaginationInstance<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 > {
   _autoResetPageIndex: () => void
-  _getPaginationRowModel?: () => RowModel<TData, TFeatures>
+  _getPaginationRowModel?: () => RowModel<TFeatures, TData>
   /**
    * Returns whether the table can go to the next page.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#getcannextpage)
@@ -112,13 +118,13 @@ export interface PaginationInstance<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#getpaginationrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/pagination)
    */
-  getPaginationRowModel: () => RowModel<TData, TFeatures>
+  getPaginationRowModel: () => RowModel<TFeatures, TData>
   /**
    * Returns the row model for the table before any pagination has been applied.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#getprepaginationrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/pagination)
    */
-  getPrePaginationRowModel: () => RowModel<TData, TFeatures>
+  getPrePaginationRowModel: () => RowModel<TFeatures, TData>
   /**
    * Increments the page index by one, if possible.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/pagination#nextpage)
@@ -206,19 +212,16 @@ export const RowPagination: TableFeature = {
     }
   },
 
-  getDefaultOptions: <
-    TData extends RowData,
-    TFeatures extends TableFeatures = {},
-  >(
-    table: Table<TData, TFeatures>
+  getDefaultOptions: <TFeatures extends TableFeatures, TData extends RowData>(
+    table: Table<TFeatures, TData>
   ): PaginationDefaultOptions => {
     return {
       onPaginationChange: makeStateUpdater('pagination', table),
     }
   },
 
-  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
-    table: Table<TData, TFeatures>
+  createTable: <TFeatures extends TableFeatures, TData extends RowData>(
+    table: Table<TFeatures, TData>
   ): void => {
     let registered = false
     let queued = false

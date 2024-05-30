@@ -2,12 +2,12 @@ import { createRow } from '../core/row'
 import { Row, RowModel, Table, RowData } from '../types'
 
 export function filterRows<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 >(
-  rows: Row<TData, TFeatures>[],
-  filterRowImpl: (row: Row<TData, TFeatures>) => any,
-  table: Table<TData, TFeatures>
+  rows: Row<TFeatures, TData>[],
+  filterRowImpl: (row: Row<TFeatures, TData>) => any,
+  table: Table<TFeatures, TData>
 ) {
   if (table.options.filterFromLeafRows) {
     return filterRowModelFromLeafs(rows, filterRowImpl, table)
@@ -17,22 +17,22 @@ export function filterRows<
 }
 
 function filterRowModelFromLeafs<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 >(
-  rowsToFilter: Row<TData, TFeatures>[],
-  filterRow: (row: Row<TData, TFeatures>) => Row<TData, TFeatures>[],
-  table: Table<TData, TFeatures>
-): RowModel<TData, TFeatures> {
-  const newFilteredFlatRows: Row<TData, TFeatures>[] = []
-  const newFilteredRowsById: Record<string, Row<TData, TFeatures>> = {}
+  rowsToFilter: Row<TFeatures, TData>[],
+  filterRow: (row: Row<TFeatures, TData>) => Row<TFeatures, TData>[],
+  table: Table<TFeatures, TData>
+): RowModel<TFeatures, TData> {
+  const newFilteredFlatRows: Row<TFeatures, TData>[] = []
+  const newFilteredRowsById: Record<string, Row<TFeatures, TData>> = {}
   const maxDepth = table.options.maxLeafRowFilterDepth ?? 100
 
   const recurseFilterRows = (
-    rowsToFilter: Row<TData, TFeatures>[],
+    rowsToFilter: Row<TFeatures, TData>[],
     depth = 0
   ) => {
-    const rows: Row<TData, TFeatures>[] = []
+    const rows: Row<TFeatures, TData>[] = []
 
     // Filter from children up first
     for (let i = 0; i < rowsToFilter.length; i++) {
@@ -87,25 +87,25 @@ function filterRowModelFromLeafs<
 }
 
 function filterRowModelFromRoot<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 >(
-  rowsToFilter: Row<TData, TFeatures>[],
-  filterRow: (row: Row<TData, TFeatures>) => any,
-  table: Table<TData, TFeatures>
-): RowModel<TData, TFeatures> {
-  const newFilteredFlatRows: Row<TData, TFeatures>[] = []
-  const newFilteredRowsById: Record<string, Row<TData, TFeatures>> = {}
+  rowsToFilter: Row<TFeatures, TData>[],
+  filterRow: (row: Row<TFeatures, TData>) => any,
+  table: Table<TFeatures, TData>
+): RowModel<TFeatures, TData> {
+  const newFilteredFlatRows: Row<TFeatures, TData>[] = []
+  const newFilteredRowsById: Record<string, Row<TFeatures, TData>> = {}
   const maxDepth = table.options.maxLeafRowFilterDepth ?? 100
 
   // Filters top level and nested rows
   const recurseFilterRows = (
-    rowsToFilter: Row<TData, TFeatures>[],
+    rowsToFilter: Row<TFeatures, TData>[],
     depth = 0
   ) => {
     // Filter from parents downward first
 
-    const rows: Row<TData, TFeatures>[] = []
+    const rows: Row<TFeatures, TData>[] = []
 
     // Apply the filter to any subRows
     for (let i = 0; i < rowsToFilter.length; i++) {

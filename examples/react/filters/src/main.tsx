@@ -111,10 +111,10 @@ function App() {
   })
 
   //shows up because of RowSorting defined as _feature
-  console.log(table.getState().sorting) 
+  console.log(table.getState().sorting)
 
   //will not be present if RowExpanding is not defined as _feature
-  console.log(table.getState().expanded) 
+  console.log(table.getState().expanded)
 
   return (
     <div className="p-2">

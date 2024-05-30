@@ -3,10 +3,10 @@ import { flattenBy, getMemoOptions, memo } from '../utils'
 import { createCell } from './cell'
 
 export interface CoreRow<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 > {
-  _getAllCellsByColumnId: () => Record<string, Cell<TData, unknown, TFeatures>>
+  _getAllCellsByColumnId: () => Record<string, Cell<TFeatures, TData, unknown>>
   _uniqueValuesCache: Record<string, unknown>
   _valuesCache: Record<string, unknown>
   /**
@@ -20,25 +20,25 @@ export interface CoreRow<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/row#getallcells)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/rows)
    */
-  getAllCells: () => Cell<TData, unknown, TFeatures>[]
+  getAllCells: () => Cell<TFeatures, TData, unknown>[]
   /**
    * Returns the leaf rows for the row, not including any parent rows.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/row#getleafrows)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/rows)
    */
-  getLeafRows: () => Row<TData, TFeatures>[]
+  getLeafRows: () => Row<TFeatures, TData>[]
   /**
    * Returns the parent row for the row, if it exists.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/row#getparentrow)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/rows)
    */
-  getParentRow: () => Row<TData, TFeatures> | undefined
+  getParentRow: () => Row<TFeatures, TData> | undefined
   /**
    * Returns the parent rows for the row, all the way up to a root row.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/row#getparentrows)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/rows)
    */
-  getParentRows: () => Row<TData, TFeatures>[]
+  getParentRows: () => Row<TFeatures, TData>[]
   /**
    * Returns a unique array of values from the row for a given columnId.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/row#getuniquevalues)
@@ -92,22 +92,22 @@ export interface CoreRow<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/row#subrows)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/rows)
    */
-  subRows: Row<TData, TFeatures>[]
+  subRows: Row<TFeatures, TData>[]
 }
 
 export const createRow = <
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 >(
-  table: Table<TData, TFeatures>,
+  table: Table<TFeatures, TData>,
   id: string,
   original: TData,
   rowIndex: number,
   depth: number,
-  subRows?: Row<TData, TFeatures>[],
+  subRows?: Row<TFeatures, TData>[],
   parentId?: string
-): Row<TData, TFeatures> => {
-  let row: CoreRow<TData, TFeatures> = {
+): Row<TFeatures, TData> => {
+  let row: CoreRow<TFeatures, TData> = {
     id,
     index: rowIndex,
     original,
@@ -163,7 +163,7 @@ export const createRow = <
     getParentRow: () =>
       row.parentId ? table.getRow(row.parentId, true) : undefined,
     getParentRows: () => {
-      let parentRows: Row<TData, TFeatures>[] = []
+      let parentRows: Row<TFeatures, TData>[] = []
       let currentRow = row
       while (true) {
         const parentRow = currentRow.getParentRow()
@@ -179,7 +179,7 @@ export const createRow = <
         return leafColumns.map(column => {
           return createCell(
             table,
-            row as Row<TData, TFeatures>,
+            row as Row<TFeatures, TData>,
             column,
             column.id
           )
@@ -196,7 +196,7 @@ export const createRow = <
             acc[cell.column.id] = cell
             return acc
           },
-          {} as Record<string, Cell<TData, unknown, TFeatures>>
+          {} as Record<string, Cell<TFeatures, TData, unknown>>
         )
       },
       getMemoOptions(table.options, 'debugRows', 'getAllCellsByColumnId')
@@ -204,8 +204,8 @@ export const createRow = <
   }
 
   Object.values(table._features).forEach(feature => {
-    feature.createRow?.(row as Row<TData, TFeatures>, table)
+    feature.createRow?.(row as Row<TFeatures, TData>, table)
   })
 
-  return row as Row<TData, TFeatures>
+  return row as Row<TFeatures, TData>
 }

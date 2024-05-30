@@ -1,12 +1,12 @@
 import { RowModel, TableFeatures } from '..'
-import { Column, RowData, Table, TableFeature } from '../types'
+import { CellData, Column, RowData, Table, TableFeature } from '../types'
 
 export interface ColumnFacetingColumn<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 > {
   _getFacetedMinMaxValues?: () => undefined | [number, number]
-  _getFacetedRowModel?: () => RowModel<TData, TFeatures>
+  _getFacetedRowModel?: () => RowModel<TFeatures, TData>
   _getFacetedUniqueValues?: () => Map<any, number>
   /**
    * A function that **computes and returns** a min/max tuple derived from `column.getFacetedRowModel`. Useful for displaying faceted result values.
@@ -21,7 +21,7 @@ export interface ColumnFacetingColumn<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-faceting#getfacetedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-faceting)
    */
-  getFacetedRowModel: () => RowModel<TData, TFeatures>
+  getFacetedRowModel: () => RowModel<TFeatures, TData>
   /**
    * A function that **computes and returns** a `Map` of unique values and their occurrences derived from `column.getFacetedRowModel`. Useful for displaying faceted result values.
    * > ⚠️ Requires that you pass a valid `getFacetedUniqueValues` function to `options.getFacetedUniqueValues`. A default implementation is provided via the exported `getFacetedUniqueValues` function.
@@ -32,19 +32,19 @@ export interface ColumnFacetingColumn<
 }
 
 export interface ColumnFacetingOptions<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 > {
   getFacetedMinMaxValues?: (
-    table: Table<TData, TFeatures>,
+    table: Table<TFeatures, TData>,
     columnId: string
   ) => () => undefined | [number, number]
   getFacetedRowModel?: (
-    table: Table<TData, TFeatures>,
+    table: Table<TFeatures, TData>,
     columnId: string
-  ) => () => RowModel<TData, TFeatures>
+  ) => () => RowModel<TFeatures, TData>
   getFacetedUniqueValues?: (
-    table: Table<TData, TFeatures>,
+    table: Table<TFeatures, TData>,
     columnId: string
   ) => () => Map<any, number>
 }
@@ -53,12 +53,12 @@ export interface ColumnFacetingOptions<
 
 export const ColumnFaceting: TableFeature = {
   createColumn: <
+    TFeatures extends TableFeatures,
     TData extends RowData,
-    TValue,
-    TFeatures extends TableFeatures = {},
+    TValue extends CellData,
   >(
-    column: Column<TData, TValue, TFeatures>,
-    table: Table<TData, TFeatures>
+    column: Column<TFeatures, TData, TValue>,
+    table: Table<TFeatures, TData>
   ): void => {
     column._getFacetedRowModel =
       table.options.getFacetedRowModel &&

@@ -3,20 +3,20 @@ import { Table, Row, RowModel, RowData } from '../types'
 import { getMemoOptions, memo } from '../utils'
 
 export function getCoreRowModel<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
->(): (table: Table<TData, TFeatures>) => () => RowModel<TData, TFeatures> {
+>(): (table: Table<TFeatures, TData>) => () => RowModel<TFeatures, TData> {
   return table =>
     memo(
       () => [table.options.data],
       (
         data
       ): {
-        rows: Row<TData, TFeatures>[]
-        flatRows: Row<TData, TFeatures>[]
-        rowsById: Record<string, Row<TData, TFeatures>>
+        rows: Row<TFeatures, TData>[]
+        flatRows: Row<TFeatures, TData>[]
+        rowsById: Record<string, Row<TFeatures, TData>>
       } => {
-        const rowModel: RowModel<TData, TFeatures> = {
+        const rowModel: RowModel<TFeatures, TData> = {
           rows: [],
           flatRows: [],
           rowsById: {},
@@ -25,9 +25,9 @@ export function getCoreRowModel<
         const accessRows = (
           originalRows: TData[],
           depth = 0,
-          parentRow?: Row<TData, TFeatures>
-        ): Row<TData, TFeatures>[] => {
-          const rows = [] as Row<TData, TFeatures>[]
+          parentRow?: Row<TFeatures, TData>
+        ): Row<TFeatures, TData>[] => {
+          const rows = [] as Row<TFeatures, TData>[]
 
           for (let i = 0; i < originalRows.length; i++) {
             // This could be an expensive check at scale, so we should move it somewhere else, but where?

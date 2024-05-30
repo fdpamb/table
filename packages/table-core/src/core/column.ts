@@ -6,13 +6,14 @@ import {
   RowData,
   ColumnDefResolved,
   TableFeatures,
+  CellData,
 } from '../types'
 import { getMemoOptions, memo } from '../utils'
 
 export interface CoreColumn<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TValue,
-  TFeatures extends TableFeatures = {},
+  TValue extends CellData,
 > {
   /**
    * The resolved accessor function to use when extracting the value for the column from each row. Will only be defined if the column def has a valid accessor key or function defined.
@@ -25,13 +26,13 @@ export interface CoreColumn<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/column#columndef)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-defs)
    */
-  columnDef: ColumnDef<TData, TValue, TFeatures>
+  columnDef: ColumnDef<TFeatures, TData, TValue>
   /**
    * The child column (if the column is a group column). Will be an empty array if the column is not a group column.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/column#columns)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-defs)
    */
-  columns: Column<TData, TValue, TFeatures>[]
+  columns: Column<TFeatures, TData, TValue>[]
   /**
    * The depth of the column (if grouped) relative to the root column def array.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/column#depth)
@@ -43,13 +44,13 @@ export interface CoreColumn<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/column#getflatcolumns)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-defs)
    */
-  getFlatColumns: () => Column<TData, TValue, TFeatures>[]
+  getFlatColumns: () => Column<TFeatures, TData, TValue>[]
   /**
    * Returns an array of all leaf-node columns for this column. If a column has no children, it is considered the only leaf-node column.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/column#getleafcolumns)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-defs)
    */
-  getLeafColumns: () => Column<TData, TValue, TFeatures>[]
+  getLeafColumns: () => Column<TFeatures, TData, TValue>[]
   /**
    * The resolved unique identifier for the column resolved in this priority:
       - A manual `id` property from the column def
@@ -64,25 +65,25 @@ export interface CoreColumn<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/core/column#parent)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-defs)
    */
-  parent?: Column<TData, TValue, TFeatures>
+  parent?: Column<TFeatures, TData, TValue>
 }
 
 export function createColumn<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TValue,
-  TFeatures extends TableFeatures = {},
+  TValue extends CellData,
 >(
-  table: Table<TData, TFeatures>,
-  columnDef: ColumnDef<TData, TValue, TFeatures>,
+  table: Table<TFeatures, TData>,
+  columnDef: ColumnDef<TFeatures, TData, TValue>,
   depth: number,
-  parent?: Column<TData, TValue, TFeatures>
-): Column<TData, TValue, TFeatures> {
+  parent?: Column<TFeatures, TData, TValue>
+): Column<TFeatures, TData, TValue> {
   const defaultColumn = table._getDefaultColumnDef()
 
   const resolvedColumnDef = {
     ...defaultColumn,
     ...columnDef,
-  } as ColumnDefResolved<TData, TValue, TFeatures>
+  } as ColumnDefResolved<TFeatures, TData, TValue>
 
   const accessorKey = resolvedColumnDef.accessorKey
 
@@ -101,7 +102,7 @@ export function createColumn<
     // Support deep accessor keys
     if (accessorKey.includes('.')) {
       accessorFn = (originalRow: TData) => {
-        let result = originalRow as Record<string, any>
+        let result = originalRow
 
         for (const key of accessorKey.split('.')) {
           result = result?.[key]
@@ -131,18 +132,18 @@ export function createColumn<
     throw new Error()
   }
 
-  let column: CoreColumn<TData, any> = {
+  let column: CoreColumn<TFeatures, TData, TValue> = {
     id: `${String(id)}`,
     accessorFn,
     parent: parent as any,
     depth,
-    columnDef: resolvedColumnDef as ColumnDef<TData, any>,
+    columnDef: resolvedColumnDef as ColumnDef<TFeatures, TData, TValue>,
     columns: [],
     getFlatColumns: memo(
       () => [true],
       () => {
         return [
-          column as Column<TData, TValue, TFeatures>,
+          column as Column<TFeatures, TData, TValue>,
           ...column.columns?.flatMap(d => d.getFlatColumns()),
         ]
       },
@@ -159,16 +160,16 @@ export function createColumn<
           return orderColumns(leafColumns)
         }
 
-        return [column as Column<TData, TValue, TFeatures>]
+        return [column as Column<TFeatures, TData, TValue>]
       },
       getMemoOptions(table.options, 'debugColumns', 'column.getLeafColumns')
     ),
   }
 
   Object.values(table._features).forEach(feature => {
-    feature.createColumn?.(column as Column<TData, TValue, TFeatures>, table)
+    feature.createColumn?.(column as Column<TFeatures, TData, TValue>, table)
   })
 
   // Yes, we have to convert table to unknown, because we know more than the compiler here.
-  return column as Column<TData, TValue, TFeatures>
+  return column as Column<TFeatures, TData, TValue>
 }

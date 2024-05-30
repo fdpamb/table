@@ -1,6 +1,6 @@
 import { FilterFn } from './features/ColumnFiltering'
 
-const includesString: FilterFn<any> = (
+const includesString: FilterFn<any, any> = (
   row,
   columnId: string,
   filterValue: string
@@ -17,7 +17,7 @@ const includesString: FilterFn<any> = (
 
 includesString.autoRemove = (val: any) => testFalsey(val)
 
-const includesStringSensitive: FilterFn<any> = (
+const includesStringSensitive: FilterFn<any, any> = (
   row,
   columnId: string,
   filterValue: string
@@ -29,7 +29,7 @@ const includesStringSensitive: FilterFn<any> = (
 
 includesStringSensitive.autoRemove = (val: any) => testFalsey(val)
 
-const equalsString: FilterFn<any> = (
+const equalsString: FilterFn<any, any> = (
   row,
   columnId: string,
   filterValue: string
@@ -42,7 +42,7 @@ const equalsString: FilterFn<any> = (
 
 equalsString.autoRemove = (val: any) => testFalsey(val)
 
-const arrIncludes: FilterFn<any> = (
+const arrIncludes: FilterFn<any, any> = (
   row,
   columnId: string,
   filterValue: unknown
@@ -52,7 +52,7 @@ const arrIncludes: FilterFn<any> = (
 
 arrIncludes.autoRemove = (val: any) => testFalsey(val) || !val?.length
 
-const arrIncludesAll: FilterFn<any> = (
+const arrIncludesAll: FilterFn<any, any> = (
   row,
   columnId: string,
   filterValue: unknown[]
@@ -64,7 +64,7 @@ const arrIncludesAll: FilterFn<any> = (
 
 arrIncludesAll.autoRemove = (val: any) => testFalsey(val) || !val?.length
 
-const arrIncludesSome: FilterFn<any> = (
+const arrIncludesSome: FilterFn<any, any> = (
   row,
   columnId: string,
   filterValue: unknown[]
@@ -76,13 +76,13 @@ const arrIncludesSome: FilterFn<any> = (
 
 arrIncludesSome.autoRemove = (val: any) => testFalsey(val) || !val?.length
 
-const equals: FilterFn<any> = (row, columnId: string, filterValue: unknown) => {
+const equals: FilterFn<any, any> = (row, columnId: string, filterValue: unknown) => {
   return row.getValue(columnId) === filterValue
 }
 
 equals.autoRemove = (val: any) => testFalsey(val)
 
-const weakEquals: FilterFn<any> = (
+const weakEquals: FilterFn<any, any> = (
   row,
   columnId: string,
   filterValue: unknown
@@ -92,7 +92,7 @@ const weakEquals: FilterFn<any> = (
 
 weakEquals.autoRemove = (val: any) => testFalsey(val)
 
-const inNumberRange: FilterFn<any> = (
+const inNumberRange: FilterFn<any, any> = (
   row,
   columnId: string,
   filterValue: [number, number]

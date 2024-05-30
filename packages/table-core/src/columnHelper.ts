@@ -6,6 +6,7 @@ import {
   GroupColumnDef,
   IdentifiedColumnDef,
   RowData,
+  TableFeatures,
 } from './types'
 import { DeepKeys, DeepValue } from './utils'
 
@@ -50,7 +51,10 @@ import { DeepKeys, DeepValue } from './utils'
 //   cell: info => info.getValue(),
 // })
 
-export type ColumnHelper<TData extends RowData> = {
+export type ColumnHelper<
+  TFeatures extends TableFeatures,
+  TData extends RowData,
+> = {
   accessor: <
     TAccessor extends AccessorFn<TData> | DeepKeys<TData>,
     TValue extends TAccessor extends AccessorFn<TData, infer TReturn>
@@ -61,18 +65,23 @@ export type ColumnHelper<TData extends RowData> = {
   >(
     accessor: TAccessor,
     column: TAccessor extends AccessorFn<TData>
-      ? DisplayColumnDef<TData, TValue>
-      : IdentifiedColumnDef<TData, TValue>
+      ? DisplayColumnDef<TFeatures, TData, TValue>
+      : IdentifiedColumnDef<TFeatures, TData, TValue>
   ) => TAccessor extends AccessorFn<TData>
-    ? AccessorFnColumnDef<TData, TValue>
-    : AccessorKeyColumnDef<TData, TValue>
-  display: (column: DisplayColumnDef<TData>) => DisplayColumnDef<TData, unknown>
-  group: (column: GroupColumnDef<TData>) => GroupColumnDef<TData, unknown>
+    ? AccessorFnColumnDef<TFeatures, TData, TValue>
+    : AccessorKeyColumnDef<TFeatures, TData, TValue>
+  display: (
+    column: DisplayColumnDef<TFeatures, TData, unknown>
+  ) => DisplayColumnDef<TFeatures, TData, unknown>
+  group: (
+    column: GroupColumnDef<TFeatures, TData, unknown>
+  ) => GroupColumnDef<TFeatures, TData, unknown>
 }
 
 export function createColumnHelper<
+  TFeatures extends TableFeatures,
   TData extends RowData,
->(): ColumnHelper<TData> {
+>(): ColumnHelper<TFeatures, TData> {
   return {
     accessor: (accessor, column) => {
       return typeof accessor === 'function'

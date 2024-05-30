@@ -4,9 +4,9 @@ import { getMemoOptions, memo } from '../utils'
 import { filterRows } from './filterRowsUtils'
 
 export function getFilteredRowModel<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
->(): (table: Table<TData, TFeatures>) => () => RowModel<TData, TFeatures> {
+>(): (table: Table<TFeatures, TData>) => () => RowModel<TFeatures, TData> {
   return table =>
     memo(
       () => [
@@ -26,9 +26,9 @@ export function getFilteredRowModel<
           return rowModel
         }
 
-        const resolvedColumnFilters: ResolvedColumnFilter<TData, TFeatures>[] =
+        const resolvedColumnFilters: ResolvedColumnFilter<TFeatures, TData>[] =
           []
-        const resolvedGlobalFilters: ResolvedColumnFilter<TData, TFeatures>[] =
+        const resolvedGlobalFilters: ResolvedColumnFilter<TFeatures, TData>[] =
           []
 
         ;(columnFilters ?? []).forEach(d => {
@@ -134,7 +134,7 @@ export function getFilteredRowModel<
           }
         }
 
-        const filterRowsImpl = (row: Row<TData, TFeatures>) => {
+        const filterRowsImpl = (row: Row<TFeatures, TData>) => {
           // Horizontally filter rows through each column
           for (let i = 0; i < filterableIds.length; i++) {
             if (row.columnFilters[filterableIds[i]!] === false) {

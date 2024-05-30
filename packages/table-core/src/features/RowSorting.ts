@@ -14,6 +14,8 @@ import {
   RowData,
   SortingFns,
   TableFeature,
+  TableFeatures,
+  CellData,
 } from '../types'
 
 import { isFunction, makeStateUpdater } from '../utils'
@@ -32,29 +34,29 @@ export interface SortingTableState {
 }
 
 export interface SortingFn<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 > {
   (
-    rowA: Row<TData, TFeatures>,
-    rowB: Row<TData, TFeatures>,
+    rowA: Row<TFeatures, TData>,
+    rowB: Row<TFeatures, TData>,
     columnId: string
   ): number
 }
 
 export type CustomSortingFns<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
-> = Record<string, SortingFn<TData, TFeatures>>
+> = Record<string, SortingFn<TFeatures, TData>>
 
 export type SortingFnOption<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
-> = 'auto' | keyof SortingFns | BuiltInSortingFn | SortingFn<TData, TFeatures>
+> = 'auto' | keyof SortingFns | BuiltInSortingFn | SortingFn<TFeatures, TData>
 
 export interface SortingColumnDef<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 > {
   /**
    * Enables/Disables multi-sorting for this column.
@@ -87,7 +89,7 @@ export interface SortingColumnDef<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#sortingfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/sorting)
    */
-  sortingFn?: SortingFnOption<TData, TFeatures>
+  sortingFn?: SortingFnOption<TFeatures, TData>
   /**
    * The priority of undefined values when sorting this column.
    * - `false`
@@ -103,8 +105,8 @@ export interface SortingColumnDef<
 }
 
 export interface SortingColumn<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 > {
   /**
    * Removes this column from the table's sorting state
@@ -123,7 +125,7 @@ export interface SortingColumn<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#getautosortingfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/sorting)
    */
-  getAutoSortingFn: () => SortingFn<TData, TFeatures>
+  getAutoSortingFn: () => SortingFn<TFeatures, TData>
   /**
    * Returns whether this column can be multi-sorted.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#getcanmultisort)
@@ -165,7 +167,7 @@ export interface SortingColumn<
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#getsortingfn)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/sorting)
    */
-  getSortingFn: () => SortingFn<TData, TFeatures>
+  getSortingFn: () => SortingFn<TFeatures, TData>
   /**
    * Returns a function that can be used to toggle this column's sorting state. This is useful for attaching a click handler to the column header.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#gettogglesortinghandler)
@@ -180,7 +182,10 @@ export interface SortingColumn<
   toggleSorting: (desc?: boolean, isMulti?: boolean) => void
 }
 
-interface SortingOptionsBase {
+interface SortingOptionsBase<
+  TFeatures extends TableFeatures,
+  TData extends RowData,
+> {
   /**
    * Enables/disables the ability to remove multi-sorts
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#enablemultiremove)
@@ -212,7 +217,9 @@ interface SortingOptionsBase {
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#getsortedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/sorting)
    */
-  getSortedRowModel?: (table: Table<any>) => () => RowModel<any>
+  getSortedRowModel?: (
+    table: Table<TFeatures, TData>
+  ) => () => RowModel<TFeatures, TData>
   /**
    * Pass a custom function that will be used to determine if a multi-sort event should be triggered. It is passed the event from the sort toggle handler and should return `true` if the event should trigger a multi-sort.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#ismultisortevent)
@@ -245,37 +252,40 @@ interface SortingOptionsBase {
   sortDescFirst?: boolean
 }
 
-type ResolvedSortingFns = keyof SortingFns extends never
+type ResolvedSortingFns<
+  TFeatures extends TableFeatures,
+  TData extends RowData,
+> = keyof SortingFns extends never
   ? {
-      sortingFns?: Record<string, SortingFn<any>>
+      sortingFns?: Record<string, SortingFn<TFeatures, TData>>
     }
   : {
-      sortingFns: Record<keyof SortingFns, SortingFn<any>>
+      sortingFns: Record<keyof SortingFns, SortingFn<TFeatures, TData>>
     }
 
 export interface SortingOptions<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
-> extends SortingOptionsBase,
-    ResolvedSortingFns {}
+> extends SortingOptionsBase<TFeatures, TData>,
+    ResolvedSortingFns<TFeatures, TData> {}
 
 export interface SortingInstance<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 > {
-  _getSortedRowModel?: () => RowModel<TData, TFeatures>
+  _getSortedRowModel?: () => RowModel<TFeatures, TData>
   /**
    * Returns the row model for the table before any sorting has been applied.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#getpresortedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/sorting)
    */
-  getPreSortedRowModel: () => RowModel<TData, TFeatures>
+  getPreSortedRowModel: () => RowModel<TFeatures, TData>
   /**
    * Returns the row model for the table after sorting has been applied.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#getsortedrowmodel)
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/sorting)
    */
-  getSortedRowModel: () => RowModel<TData, TFeatures>
+  getSortedRowModel: () => RowModel<TFeatures, TData>
   /**
    * Resets the **sorting** state to `initialState.sorting`, or `true` can be passed to force a default blank state reset to `[]`.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/sorting#resetsorting)
@@ -301,21 +311,18 @@ export const RowSorting: TableFeature = {
   },
 
   getDefaultColumnDef: <
+    TFeatures extends TableFeatures,
     TData extends RowData,
-    TFeatures extends TableFeatures = {},
-  >(): SortingColumnDef<TData, TFeatures> => {
+  >(): SortingColumnDef<TFeatures, TData> => {
     return {
       sortingFn: 'auto',
       sortUndefined: 1,
     }
   },
 
-  getDefaultOptions: <
-    TData extends RowData,
-    TFeatures extends TableFeatures = {},
-  >(
-    table: Table<TData, TFeatures>
-  ): SortingOptions<TData, TFeatures> => {
+  getDefaultOptions: <TFeatures extends TableFeatures, TData extends RowData>(
+    table: Table<TFeatures, TData>
+  ): SortingOptions<TFeatures, TData> => {
     return {
       onSortingChange: makeStateUpdater('sorting', table),
       isMultiSortEvent: (e: unknown) => {
@@ -325,12 +332,12 @@ export const RowSorting: TableFeature = {
   },
 
   createColumn: <
+    TFeatures extends TableFeatures,
     TData extends RowData,
-    TValue,
-    TFeatures extends TableFeatures = {},
+    TValue extends CellData,
   >(
-    column: Column<TData, TValue, TFeatures>,
-    table: Table<TData, TFeatures>
+    column: Column<TFeatures, TData, TValue>,
+    table: Table<TFeatures, TData>
   ): void => {
     column.getAutoSortingFn = () => {
       const firstRows = table.getFilteredRowModel().flatRows.slice(10)
@@ -548,8 +555,8 @@ export const RowSorting: TableFeature = {
     }
   },
 
-  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
-    table: Table<TData, TFeatures>
+  createTable: <TFeatures extends TableFeatures, TData extends RowData>(
+    table: Table<TFeatures, TData>
   ): void => {
     table.setSorting = updater => table.options.onSortingChange?.(updater)
     table.resetSorting = defaultState => {

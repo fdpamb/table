@@ -7,6 +7,7 @@ import {
   Table,
   Updater,
   TableFeature,
+  CellData,
 } from '../types'
 import { getMemoOptions, makeStateUpdater, memo } from '../utils'
 import { ColumnPinningPosition } from './ColumnPinning'
@@ -235,7 +236,11 @@ const getDefaultColumnSizingInfoState = (): ColumnSizingInfoState => ({
 })
 
 export const ColumnSizing: TableFeature = {
-  getDefaultColumnDef: (): ColumnSizingColumnDef => {
+  getDefaultColumnDef: <
+    TFeatures extends TableFeatures,
+    TData extends RowData,
+    TValue extends CellData,
+  >(): ColumnSizingColumnDef => {
     return defaultColumnSizing
   },
   getInitialState: (state): ColumnSizingTableState => {
@@ -246,11 +251,8 @@ export const ColumnSizing: TableFeature = {
     }
   },
 
-  getDefaultOptions: <
-    TData extends RowData,
-    TFeatures extends TableFeatures = {},
-  >(
-    table: Table<TData, TFeatures>
+  getDefaultOptions: <TFeatures extends TableFeatures, TData extends RowData>(
+    table: Table<TFeatures, TData>
   ): ColumnSizingDefaultOptions => {
     return {
       columnResizeMode: 'onEnd',
@@ -261,12 +263,12 @@ export const ColumnSizing: TableFeature = {
   },
 
   createColumn: <
+    TFeatures extends TableFeatures,
     TData extends RowData,
-    TValue,
-    TFeatures extends TableFeatures = {},
+    TValue extends CellData,
   >(
-    column: Column<TData, TValue, TFeatures>,
-    table: Table<TData, TFeatures>
+    column: Column<TFeatures, TData, TValue>,
+    table: Table<TFeatures, TData>
   ): void => {
     column.getSize = () => {
       const columnSize = table.getState().columnSizing[column.id]
@@ -323,17 +325,17 @@ export const ColumnSizing: TableFeature = {
   },
 
   createHeader: <
+    TFeatures extends TableFeatures,
     TData extends RowData,
-    TValue,
-    TFeatures extends TableFeatures = {},
+    TValue extends CellData,
   >(
-    header: Header<TData, TValue, TFeatures>,
-    table: Table<TData, TFeatures>
+    header: Header<TFeatures, TData, TValue>,
+    table: Table<TFeatures, TData>
   ): void => {
     header.getSize = () => {
       let sum = 0
 
-      const recurse = (header: Header<TData, TValue, TFeatures>) => {
+      const recurse = (header: Header<TFeatures, TData, TValue>) => {
         if (header.subHeaders.length) {
           header.subHeaders.forEach(recurse)
         } else {
@@ -527,8 +529,8 @@ export const ColumnSizing: TableFeature = {
     }
   },
 
-  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
-    table: Table<TData, TFeatures>
+  createTable: <TFeatures extends TableFeatures, TData extends RowData>(
+    table: Table<TFeatures, TData>
   ): void => {
     table.setColumnSizing = updater =>
       table.options.onColumnSizingChange?.(updater)

@@ -2,10 +2,10 @@ import { Table, RowData } from '../types'
 import { getMemoOptions, memo } from '../utils'
 
 export function getFacetedUniqueValues<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 >(): (
-  table: Table<TData, TFeatures>,
+  table: Table<TFeatures, TData>,
   columnId: string
 ) => () => Map<any, number> {
   return (table, columnId) =>

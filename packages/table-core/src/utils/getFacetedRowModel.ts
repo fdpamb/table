@@ -3,12 +3,12 @@ import { getMemoOptions, memo } from '../utils'
 import { filterRows } from './filterRowsUtils'
 
 export function getFacetedRowModel<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 >(): (
-  table: Table<TData, TFeatures>,
+  table: Table<TFeatures, TData>,
   columnId: string
-) => () => RowModel<TData, TFeatures> {
+) => () => RowModel<TFeatures, TData> {
   return (table, columnId) =>
     memo(
       () => [
@@ -30,7 +30,7 @@ export function getFacetedRowModel<
           globalFilter ? '__global__' : undefined,
         ].filter(Boolean) as string[]
 
-        const filterRowsImpl = (row: Row<TData, TFeatures>) => {
+        const filterRowsImpl = (row: Row<TFeatures, TData>) => {
           // Horizontally filter rows through each column
           for (let i = 0; i < filterableIds.length; i++) {
             if (row.columnFilters[filterableIds[i]!] === false) {

@@ -1,6 +1,7 @@
 import { getMemoOptions, makeStateUpdater, memo } from '../utils'
 
 import {
+  CellData,
   Column,
   OnChangeFn,
   RowData,
@@ -57,12 +58,12 @@ export interface ColumnOrderDefaultOptions {
 }
 
 export interface ColumnOrderInstance<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 > {
   _getOrderColumnsFn: () => (
-    columns: Column<TData, unknown, TFeatures>[]
-  ) => Column<TData, unknown, TFeatures>[]
+    columns: Column<TFeatures, TData, unknown>[]
+  ) => Column<TFeatures, TData, unknown>[]
   /**
    * Resets the **columnOrder** state to `initialState.columnOrder`, or `true` can be passed to force a default blank state reset to `[]`.
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/column-ordering#resetcolumnorder)
@@ -87,24 +88,21 @@ export const ColumnOrdering: TableFeature = {
     }
   },
 
-  getDefaultOptions: <
-    TData extends RowData,
-    TFeatures extends TableFeatures = {},
-  >(
-    table: Table<TData, TFeatures>
-  ): ColumnOrderDefaultOptions<TData, TFeatures> => {
+  getDefaultOptions: <TFeatures extends TableFeatures, TData extends RowData>(
+    table: Table<TFeatures, TData>
+  ): ColumnOrderDefaultOptions<TFeatures, TData> => {
     return {
       onColumnOrderChange: makeStateUpdater('columnOrder', table),
     }
   },
 
   createColumn: <
+    TFeatures extends TableFeatures,
     TData extends RowData,
-    TValue,
-    TFeatures extends TableFeatures = {},
+    TValue extends CellData,
   >(
-    column: Column<TData, TValue, TFeatures>,
-    table: Table<TData, TFeatures>
+    column: Column<TFeatures, TData, TValue>,
+    table: Table<TFeatures, TData>
   ): void => {
     column.getIndex = memo(
       position => [_getVisibleLeafColumns(table, position)],
@@ -121,8 +119,8 @@ export const ColumnOrdering: TableFeature = {
     }
   },
 
-  createTable: <TData extends RowData, TFeatures extends TableFeatures = {}>(
-    table: Table<TData, TFeatures>
+  createTable: <TFeatures extends TableFeatures, TData extends RowData>(
+    table: Table<TFeatures, TData>
   ): void => {
     table.setColumnOrder = updater =>
       table.options.onColumnOrderChange?.(updater)
@@ -138,10 +136,10 @@ export const ColumnOrdering: TableFeature = {
         table.options.groupedColumnMode,
       ],
       (columnOrder, grouping, groupedColumnMode) =>
-        (columns: Column<TData, unknown, TFeatures>[]) => {
+        (columns: Column<TFeatures, TData, unknown>[]) => {
           // Sort grouped columns to the start of the column list
           // before the headers are built
-          let orderedColumns: Column<TData, unknown, TFeatures>[] = []
+          let orderedColumns: Column<TFeatures, TData, unknown>[] = []
 
           // If there is no order, return the normal columns
           if (!columnOrder?.length) {

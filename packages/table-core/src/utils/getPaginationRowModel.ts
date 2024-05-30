@@ -3,11 +3,11 @@ import { getMemoOptions, memo } from '../utils'
 import { expandRows } from './getExpandedRowModel'
 
 export function getPaginationRowModel<
+  TFeatures extends TableFeatures,
   TData extends RowData,
-  TFeatures extends TableFeatures = {},
 >(opts?: {
   initialSync: boolean
-}): (table: Table<TData, TFeatures>) => () => RowModel<TData, TFeatures> {
+}): (table: Table<TFeatures, TData>) => () => RowModel<TFeatures, TData> {
   return table =>
     memo(
       () => [
@@ -29,7 +29,7 @@ export function getPaginationRowModel<
 
         rows = rows.slice(pageStart, pageEnd)
 
-        let paginatedRowModel: RowModel<TData, TFeatures>
+        let paginatedRowModel: RowModel<TFeatures, TData>
 
         if (!table.options.paginateExpandedRows) {
           paginatedRowModel = expandRows({
@@ -47,7 +47,7 @@ export function getPaginationRowModel<
 
         paginatedRowModel.flatRows = []
 
-        const handleRow = (row: Row<TData, TFeatures>) => {
+        const handleRow = (row: Row<TFeatures, TData>) => {
           paginatedRowModel.flatRows.push(row)
           if (row.subRows.length) {
             row.subRows.forEach(handleRow)

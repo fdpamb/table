@@ -1,4 +1,9 @@
-import { TableOptionsResolved, TableState, Updater } from './types'
+import {
+  TableFeatures,
+  TableOptionsResolved,
+  TableState,
+  Updater,
+} from './types'
 
 export type PartialKeys<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 export type RequiredKeys<T, K extends keyof T> = Omit<T, K> &
@@ -87,11 +92,11 @@ export function noop() {
   //
 }
 
-export function makeStateUpdater<K extends keyof TableState>(
-  key: K,
-  instance: unknown
-) {
-  return (updater: Updater<TableState[K]>) => {
+export function makeStateUpdater<
+  TFeatures extends TableFeatures,
+  K extends keyof TableState<TFeatures>,
+>(key: K, instance: unknown) {
+  return (updater: Updater<TableState<TFeatures>[K]>) => {
     ;(instance as any).setState(<TTableState>(old: TTableState) => {
       return {
         ...old,
@@ -199,7 +204,7 @@ export function memo<TDeps extends readonly any[], TDepArgs, TResult>(
 }
 
 export function getMemoOptions(
-  tableOptions: Partial<TableOptionsResolved<any>>,
+  tableOptions: Partial<TableOptionsResolved<any, any>>,
   debugLevel:
     | 'debugAll'
     | 'debugCells'
