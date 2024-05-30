@@ -119,7 +119,7 @@ export interface CoreHeader<
   subHeaders: Header<TFeatures, TData, TValue>[]
 }
 
-export interface HeadersInstance<
+export interface HeadersTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

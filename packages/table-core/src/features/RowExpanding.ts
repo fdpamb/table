@@ -105,7 +105,7 @@ export interface ExpandedOptions<
   paginateExpandedRows?: boolean
 }
 
-export interface ExpandedInstance<
+export interface ExpandedTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

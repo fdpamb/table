@@ -206,7 +206,7 @@ export interface CoreRowModelOptions<
   ) => () => RowModel<TFeatures, TData>
 }
 
-export interface CoreInstance<
+export interface CoreTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {
@@ -352,7 +352,7 @@ export function createTable<
   const queued: (() => void)[] = []
   let queuedTimeout = false
 
-  const coreInstance: CoreInstance<TFeatures, TData> = {
+  const coreInstance: CoreTable<TFeatures, TData> = {
     _features,
     options: {
       ...defaultOptions,

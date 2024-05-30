@@ -239,7 +239,7 @@ export interface ColumnGroupingOptions<
 
 export type GroupingColumnMode = false | 'reorder' | 'remove'
 
-export interface ColumnGroupingInstance<
+export interface ColumnGroupingTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

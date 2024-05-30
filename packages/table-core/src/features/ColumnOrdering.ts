@@ -57,7 +57,7 @@ export interface ColumnOrderDefaultOptions {
   onColumnOrderChange: OnChangeFn<ColumnOrderState>
 }
 
-export interface ColumnOrderInstance<
+export interface ColumnOrderTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

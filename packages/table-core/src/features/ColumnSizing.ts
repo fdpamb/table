@@ -75,7 +75,7 @@ export type ColumnSizingDefaultOptions = Pick<
   | 'columnResizeDirection'
 >
 
-export interface ColumnSizingInstance<
+export interface ColumnSizingTable<
   TData extends RowData,
   TFeatures extends TableFeatures,
 > {

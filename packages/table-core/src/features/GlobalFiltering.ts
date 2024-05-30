@@ -71,7 +71,7 @@ export interface GlobalFilterOptions<
   onGlobalFilterChange?: OnChangeFn<any>
 }
 
-export interface GlobalFilterInstance<
+export interface GlobalFilterTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

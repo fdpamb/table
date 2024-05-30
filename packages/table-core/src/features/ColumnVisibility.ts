@@ -39,7 +39,7 @@ export type ColumnVisibilityDefaultOptions = Pick<
   'onColumnVisibilityChange'
 >
 
-export interface ColumnVisibilityInstance<
+export interface ColumnVisibilityTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

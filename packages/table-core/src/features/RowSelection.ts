@@ -111,7 +111,7 @@ export interface RowSelectionRow {
   toggleSelected: (value?: boolean, opts?: { selectChildren?: boolean }) => void
 }
 
-export interface RowSelectionInstance<
+export interface RowSelectionTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

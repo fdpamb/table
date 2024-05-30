@@ -269,7 +269,7 @@ export interface SortingOptions<
 > extends SortingOptionsBase<TFeatures, TData>,
     ResolvedSortingFns<TFeatures, TData> {}
 
-export interface SortingInstance<
+export interface SortingTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

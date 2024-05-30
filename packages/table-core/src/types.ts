@@ -1,6 +1,6 @@
-import { CoreOptions, CoreInstance, CoreRowModelOptions } from './core/table'
+import { CoreOptions, CoreTable, CoreRowModelOptions } from './core/table'
 import {
-  ColumnVisibilityInstance,
+  ColumnVisibilityTable,
   ColumnVisibilityTableState,
   ColumnVisibilityColumn as ColumnVisibilityColumn,
   VisibilityOptions,
@@ -9,20 +9,20 @@ import {
 } from './features/ColumnVisibility'
 import {
   ColumnOrderColumn,
-  ColumnOrderInstance,
+  ColumnOrderTable,
   ColumnOrderOptions,
   ColumnOrderTableState,
 } from './features/ColumnOrdering'
 import {
   ColumnPinningColumn,
   ColumnPinningColumnDef,
-  ColumnPinningInstance,
+  ColumnPinningTable,
   ColumnPinningOptions,
   ColumnPinningRow,
   ColumnPinningTableState,
 } from './features/ColumnPinning'
 import {
-  RowPinningInstance,
+  RowPinningTable,
   RowPinningOptions,
   RowPinningRow,
   RowPinningTableState,
@@ -31,17 +31,17 @@ import {
   CoreHeader,
   CoreHeaderGroup,
   HeaderContext,
-  HeadersInstance,
+  HeadersTable,
 } from './core/headers'
 import {
   ColumnFacetingColumn,
   ColumnFacetingOptions,
 } from './features/ColumnFaceting'
-import { GlobalFacetingInstance } from './features/GlobalFaceting'
+import { GlobalFacetingTable } from './features/GlobalFaceting'
 import {
   ColumnFilteringColumn,
   ColumnFilteringColumnDef,
-  ColumnFilteringInstance,
+  ColumnFilteringTable,
   ColumnFilteringOptions,
   ColumnFiltersRow,
   ColumnFilteringTableState,
@@ -49,14 +49,14 @@ import {
 import {
   GlobalFilterColumn,
   GlobalFilterColumnDef,
-  GlobalFilterInstance,
+  GlobalFilterTable,
   GlobalFilterOptions,
   GlobalFilterTableState,
 } from './features/GlobalFiltering'
 import {
   SortingColumn,
   SortingColumnDef,
-  SortingInstance,
+  SortingTable,
   SortingOptions,
   SortingTableState,
 } from './features/RowSorting'
@@ -64,13 +64,13 @@ import {
   ColumnGroupingCell,
   ColumnGroupingColumn,
   ColumnGroupingColumnDef,
-  ColumnGroupingInstance,
+  ColumnGroupingTable,
   ColumnGroupingOptions,
   ColumnGroupingRow,
   ColumnGroupingTableState,
 } from './features/ColumnGrouping'
 import {
-  ExpandedInstance,
+  ExpandedTable,
   ExpandedOptions,
   ExpandedTableState,
   ExpandedRow,
@@ -79,17 +79,17 @@ import {
   ColumnSizingColumn,
   ColumnSizingColumnDef,
   ColumnSizingHeader,
-  ColumnSizingInstance,
+  ColumnSizingTable,
   ColumnSizingOptions,
   ColumnSizingTableState,
 } from './features/ColumnSizing'
 import {
-  PaginationInstance,
+  PaginationTable,
   PaginationOptions,
   PaginationTableState,
 } from './features/RowPagination'
 import {
-  RowSelectionInstance,
+  RowSelectionTable,
   RowSelectionOptions,
   RowSelectionRow,
   RowSelectionTableState,
@@ -196,46 +196,46 @@ export type AnyRender = (Comp: any, props: any) => any
 export type Table<
   TFeatures extends TableFeatures,
   TData extends RowData,
-> = (CoreInstance<TFeatures, TData> & HeadersInstance<TFeatures, TData>) &
+> = (CoreTable<TFeatures, TData> & HeadersTable<TFeatures, TData>) &
   UnionToIntersection<
     | ('ColumnFiltering' extends keyof TFeatures
-        ? ColumnFilteringInstance<TFeatures, TData>
+        ? ColumnFilteringTable<TFeatures, TData>
         : never)
     | ('ColumnGrouping' extends keyof TFeatures
-        ? ColumnGroupingInstance<TFeatures, TData>
+        ? ColumnGroupingTable<TFeatures, TData>
         : never)
     | ('ColumnOrdering' extends keyof TFeatures
-        ? ColumnOrderInstance<TFeatures, TData>
+        ? ColumnOrderTable<TFeatures, TData>
         : never)
     | ('ColumnPinning' extends keyof TFeatures
-        ? ColumnPinningInstance<TFeatures, TData>
+        ? ColumnPinningTable<TFeatures, TData>
         : never)
     | ('ColumnSizing' extends keyof TFeatures
-        ? ColumnSizingInstance<TFeatures, TData>
+        ? ColumnSizingTable<TFeatures, TData>
         : never)
     | ('ColumnVisibility' extends keyof TFeatures
-        ? ColumnVisibilityInstance<TFeatures, TData>
+        ? ColumnVisibilityTable<TFeatures, TData>
         : never)
     | ('GlobalFaceting' extends keyof TFeatures
-        ? GlobalFacetingInstance<TFeatures, TData>
+        ? GlobalFacetingTable<TFeatures, TData>
         : never)
     | ('GlobalFiltering' extends keyof TFeatures
-        ? GlobalFilterInstance<TFeatures, TData>
+        ? GlobalFilterTable<TFeatures, TData>
         : never)
     | ('RowExpanding' extends keyof TFeatures
-        ? ExpandedInstance<TFeatures, TData>
+        ? ExpandedTable<TFeatures, TData>
         : never)
     | ('RowPagination' extends keyof TFeatures
-        ? PaginationInstance<TFeatures, TData>
+        ? PaginationTable<TFeatures, TData>
         : never)
     | ('RowPinning' extends keyof TFeatures
-        ? RowPinningInstance<TFeatures, TData>
+        ? RowPinningTable<TFeatures, TData>
         : never)
     | ('RowSelection' extends keyof TFeatures
-        ? RowSelectionInstance<TFeatures, TData>
+        ? RowSelectionTable<TFeatures, TData>
         : never)
     | ('RowSorting' extends keyof TFeatures
-        ? SortingInstance<TFeatures, TData>
+        ? SortingTable<TFeatures, TData>
         : never)
   >
 

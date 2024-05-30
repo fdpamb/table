@@ -1,7 +1,7 @@
 import { RowModel } from '..'
 import { Table, RowData, TableFeature, TableFeatures } from '../types'
 
-export interface GlobalFacetingInstance<
+export interface GlobalFacetingTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

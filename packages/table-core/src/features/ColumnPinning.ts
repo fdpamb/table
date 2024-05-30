@@ -109,7 +109,7 @@ export interface ColumnPinningRow<
   getRightVisibleCells: () => Cell<TFeatures, TData, unknown>[]
 }
 
-export interface ColumnPinningInstance<
+export interface ColumnPinningTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

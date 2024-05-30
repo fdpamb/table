@@ -220,7 +220,7 @@ export interface ColumnFilteringOptions<
 > extends ColumnFilteringOptionsBase<TFeatures, TData>,
     ResolvedFilterFns<TFeatures, TData> {}
 
-export interface ColumnFilteringInstance<
+export interface ColumnFilteringTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

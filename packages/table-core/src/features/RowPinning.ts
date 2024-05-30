@@ -79,7 +79,7 @@ export interface RowPinningRow {
   ) => void
 }
 
-export interface RowPinningInstance<
+export interface RowPinningTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {

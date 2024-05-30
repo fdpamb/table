@@ -1,13 +1,15 @@
 import { RowModel, TableFeatures } from '..'
+import {
+  getColumnFacetedRowModel,
+  getColumnFacetedMinMaxValues,
+  getColumnFacetedUniqueValues,
+} from '../functions/ColumnFaceting'
 import { CellData, Column, RowData, Table, TableFeature } from '../types'
 
 export interface ColumnFacetingColumn<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {
-  _getFacetedMinMaxValues?: () => undefined | [number, number]
-  _getFacetedRowModel?: () => RowModel<TFeatures, TData>
-  _getFacetedUniqueValues?: () => Map<any, number>
   /**
    * A function that **computes and returns** a min/max tuple derived from `column.getFacetedRowModel`. Useful for displaying faceted result values.
    * > ⚠️ Requires that you pass a valid `getFacetedMinMaxValues` function to `options.getFacetedMinMaxValues`. A default implementation is provided via the exported `getFacetedMinMaxValues` function.
@@ -53,42 +55,17 @@ export interface ColumnFacetingOptions<
 
 export const ColumnFaceting: TableFeature = {
   createColumn: <
-    TFeatures extends TableFeatures,
+    _TFeatures extends TableFeatures,
     TData extends RowData,
     TValue extends CellData,
   >(
-    column: Column<TFeatures, TData, TValue>,
-    table: Table<TFeatures, TData>
+    column: Column<{ ColumnFaceting: any }, TData, TValue>,
+    table: Table<{ ColumnFaceting: any }, TData>
   ): void => {
-    column._getFacetedRowModel =
-      table.options.getFacetedRowModel &&
-      table.options.getFacetedRowModel(table, column.id)
-    column.getFacetedRowModel = () => {
-      if (!column._getFacetedRowModel) {
-        return table.getPreFilteredRowModel()
-      }
-
-      return column._getFacetedRowModel()
-    }
-    column._getFacetedUniqueValues =
-      table.options.getFacetedUniqueValues &&
-      table.options.getFacetedUniqueValues(table, column.id)
-    column.getFacetedUniqueValues = () => {
-      if (!column._getFacetedUniqueValues) {
-        return new Map()
-      }
-
-      return column._getFacetedUniqueValues()
-    }
-    column._getFacetedMinMaxValues =
-      table.options.getFacetedMinMaxValues &&
-      table.options.getFacetedMinMaxValues(table, column.id)
-    column.getFacetedMinMaxValues = () => {
-      if (!column._getFacetedMinMaxValues) {
-        return undefined
-      }
-
-      return column._getFacetedMinMaxValues()
-    }
+    column.getFacetedMinMaxValues = () =>
+      getColumnFacetedMinMaxValues(column, table)
+    column.getFacetedRowModel = () => getColumnFacetedRowModel(column, table)
+    column.getFacetedUniqueValues = () =>
+      getColumnFacetedUniqueValues(column, table)
   },
 }

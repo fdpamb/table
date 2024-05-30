@@ -77,7 +77,7 @@ export interface PaginationDefaultOptions {
   onPaginationChange: OnChangeFn<PaginationState>
 }
 
-export interface PaginationInstance<
+export interface PaginationTable<
   TFeatures extends TableFeatures,
   TData extends RowData,
 > {
