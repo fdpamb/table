@@ -1,7 +1,9 @@
 import { ColumnFacetingOptions } from '../features/ColumnFaceting'
 import { CellData, Column, RowData, Table, TableFeatures } from '../types'
 
-export const getColumnFacetedMinMaxValues = <
+// These functions can only assume that the APIs/types from the ColumnFaceting feature are available
+
+export function getColumnFacetedMinMaxValues<
   TFeatures extends TableFeatures,
   TData extends RowData,
   TValue extends CellData,
@@ -10,13 +12,13 @@ export const getColumnFacetedMinMaxValues = <
   table: Table<TFeatures, TData> & {
     options: ColumnFacetingOptions<TFeatures, TData>
   }
-) => {
+): [number, number] | undefined {
   return table.options.getFacetedMinMaxValues?.(table, column.id) as
     | [number, number]
     | undefined
 }
 
-export const getColumnFacetedRowModel = <
+export function getColumnFacetedRowModel<
   TFeatures extends TableFeatures,
   TData extends RowData,
   TValue extends CellData,
@@ -25,14 +27,14 @@ export const getColumnFacetedRowModel = <
   table: Table<TFeatures, TData> & {
     options: ColumnFacetingOptions<TFeatures, TData>
   }
-) => {
+) {
   return (
     table.options.getFacetedRowModel?.(table, column.id) ??
-    table.getPreFilteredRowModel() //TODO - use static function
+    table.getPreFilteredRowModel() // TODO - reference static function
   )
 }
 
-export const getColumnFacetedUniqueValues = <
+export function getColumnFacetedUniqueValues<
   TFeatures extends TableFeatures,
   TData extends RowData,
   TValue extends CellData,
@@ -41,7 +43,7 @@ export const getColumnFacetedUniqueValues = <
   table: Table<TFeatures, TData> & {
     options: ColumnFacetingOptions<TFeatures, TData>
   }
-) => {
+) {
   return (table.options.getFacetedUniqueValues?.(table, column.id) ??
     new Map<any, number>()) as Map<any, number>
 }

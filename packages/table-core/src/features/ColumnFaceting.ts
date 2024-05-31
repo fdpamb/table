@@ -1,10 +1,17 @@
-import { RowModel, TableFeatures } from '..'
 import {
   getColumnFacetedRowModel,
   getColumnFacetedMinMaxValues,
   getColumnFacetedUniqueValues,
-} from '../functions/ColumnFaceting'
-import { CellData, Column, RowData, Table, TableFeature } from '../types'
+} from '../functions/ColumnFacetingFns'
+import {
+  CellData,
+  Column,
+  RowData,
+  Table,
+  TableFeature,
+  TableFeatures,
+  RowModel,
+} from '../types'
 
 export interface ColumnFacetingColumn<
   TFeatures extends TableFeatures,
@@ -59,8 +66,8 @@ export const ColumnFaceting: TableFeature = {
     TData extends RowData,
     TValue extends CellData,
   >(
-    column: Column<{ ColumnFaceting: any }, TData, TValue>,
-    table: Table<{ ColumnFaceting: any }, TData>
+    column: Column<{ ColumnFaceting: TableFeature }, TData, TValue>,
+    table: Table<{ ColumnFaceting: TableFeature }, TData>
   ): void => {
     column.getFacetedMinMaxValues = () =>
       getColumnFacetedMinMaxValues(column, table)
