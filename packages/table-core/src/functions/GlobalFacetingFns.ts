@@ -1,9 +1,9 @@
-// These functions can only assume that the APIs/types from the GlobalFaceting and ColumnFaceting features are available
-
 import { ColumnFacetingOptions } from '../features/ColumnFaceting'
 import { ColumnFilteringOptions } from '../features/ColumnFiltering'
 import { GlobalFacetingTable } from '../features/GlobalFaceting'
 import { RowData, Table, TableFeatures } from '../types'
+
+// These functions can only assume that the APIs/types from the GlobalFaceting and ColumnFaceting features are available
 
 export function getTableGlobalFacetedMinMaxValues<
   TFeatures extends TableFeatures,

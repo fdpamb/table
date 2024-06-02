@@ -1,3 +1,4 @@
+import { getInitialRowPinningState } from '../functions/RowPinningFns'
 import {
   OnChangeFn,
   Updater,
@@ -130,12 +131,7 @@ const getDefaultRowPinningState = (): RowPinningState => ({
 })
 
 export const RowPinning: TableFeature = {
-  getInitialState: (state): RowPinningTableState => {
-    return {
-      rowPinning: getDefaultRowPinningState(),
-      ...state,
-    }
-  },
+  getInitialState: state => getInitialRowPinningState(state),
 
   getDefaultOptions: <TFeatures extends TableFeatures, TData extends RowData>(
     table: Table<TFeatures, TData>
