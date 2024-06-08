@@ -1,5 +1,5 @@
 import { createRow } from '../core/row'
-import { Row, RowModel, Table, RowData } from '../types'
+import { Row, RowModel, Table, RowData, TableFeatures } from '../types'
 
 export function filterRows<
   TFeatures extends TableFeatures,

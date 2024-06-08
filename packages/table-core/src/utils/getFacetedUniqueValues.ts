@@ -1,4 +1,4 @@
-import { Table, RowData } from '../types'
+import { Table, RowData, TableFeatures } from '../types'
 import { getMemoOptions, memo } from '../utils'
 
 export function getFacetedUniqueValues<

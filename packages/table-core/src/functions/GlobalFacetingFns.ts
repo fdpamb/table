@@ -5,7 +5,7 @@ import { RowData, Table, TableFeatures } from '../types'
 
 // These functions can only assume that the APIs/types from the GlobalFaceting and ColumnFaceting features are available
 
-export function getTableGlobalFacetedMinMaxValues<
+export function table_getGlobalFacetedMinMaxValues<
   TFeatures extends TableFeatures,
   TData extends RowData,
 >(
@@ -19,7 +19,7 @@ export function getTableGlobalFacetedMinMaxValues<
     | undefined
 }
 
-export function getTableGlobalFacetedRowModel<
+export function table_getGlobalFacetedRowModel<
   TFeatures extends TableFeatures,
   TData extends RowData,
 >(
@@ -36,7 +36,7 @@ export function getTableGlobalFacetedRowModel<
   )
 }
 
-export function getTableGlobalFacetedUniqueValues<
+export function table_getGlobalFacetedUniqueValues<
   TFeatures extends TableFeatures,
   TData extends RowData,
 >(

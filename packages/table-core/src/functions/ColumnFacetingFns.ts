@@ -3,7 +3,7 @@ import { CellData, Column, RowData, Table, TableFeatures } from '../types'
 
 // These functions can only assume that the APIs/types from the ColumnFaceting feature are available
 
-export function getColumnFacetedMinMaxValues<
+export function column_getFacetedMinMaxValues<
   TFeatures extends TableFeatures,
   TData extends RowData,
   TValue extends CellData,
@@ -18,7 +18,7 @@ export function getColumnFacetedMinMaxValues<
     | undefined
 }
 
-export function getColumnFacetedRowModel<
+export function column_getFacetedRowModel<
   TFeatures extends TableFeatures,
   TData extends RowData,
   TValue extends CellData,
@@ -34,7 +34,7 @@ export function getColumnFacetedRowModel<
   )
 }
 
-export function getColumnFacetedUniqueValues<
+export function column_getFacetedUniqueValues<
   TFeatures extends TableFeatures,
   TData extends RowData,
   TValue extends CellData,

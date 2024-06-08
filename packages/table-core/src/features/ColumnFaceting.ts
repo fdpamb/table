@@ -1,7 +1,7 @@
 import {
-  getColumnFacetedRowModel,
-  getColumnFacetedMinMaxValues,
-  getColumnFacetedUniqueValues,
+  column_getFacetedRowModel,
+  column_getFacetedMinMaxValues,
+  column_getFacetedUniqueValues,
 } from '../functions/ColumnFacetingFns'
 import {
   CellData,
@@ -70,9 +70,9 @@ export const ColumnFaceting: TableFeature = {
     table: Table<{ ColumnFaceting: TableFeature }, TData>
   ): void => {
     column.getFacetedMinMaxValues = () =>
-      getColumnFacetedMinMaxValues(column, table)
-    column.getFacetedRowModel = () => getColumnFacetedRowModel(column, table)
+      column_getFacetedMinMaxValues(column, table)
+    column.getFacetedRowModel = () => column_getFacetedRowModel(column, table)
     column.getFacetedUniqueValues = () =>
-      getColumnFacetedUniqueValues(column, table)
+      column_getFacetedUniqueValues(column, table)
   },
 }

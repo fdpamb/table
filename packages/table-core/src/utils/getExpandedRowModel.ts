@@ -1,4 +1,4 @@
-import { Table, Row, RowModel, RowData } from '../types'
+import { Table, Row, RowModel, RowData, TableFeatures } from '../types'
 import { getMemoOptions, memo } from '../utils'
 
 export function getExpandedRowModel<

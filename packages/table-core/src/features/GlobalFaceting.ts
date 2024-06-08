@@ -1,8 +1,8 @@
 import { RowModel } from '..'
 import {
-  getTableGlobalFacetedMinMaxValues,
-  getTableGlobalFacetedRowModel,
-  getTableGlobalFacetedUniqueValues,
+  table_getGlobalFacetedMinMaxValues,
+  table_getGlobalFacetedRowModel,
+  table_getGlobalFacetedUniqueValues,
 } from '../functions/GlobalFacetingFns'
 import { Table, RowData, TableFeature, TableFeatures } from '../types'
 
@@ -37,9 +37,9 @@ export const GlobalFaceting: TableFeature = {
     table: Table<{ GlobalFaceting: any }, TData>
   ): void => {
     table.getGlobalFacetedMinMaxValues = () =>
-      getTableGlobalFacetedMinMaxValues(table)
-    table.getGlobalFacetedRowModel = () => getTableGlobalFacetedRowModel(table)
+      table_getGlobalFacetedMinMaxValues(table)
+    table.getGlobalFacetedRowModel = () => table_getGlobalFacetedRowModel(table)
     table.getGlobalFacetedUniqueValues = () =>
-      getTableGlobalFacetedUniqueValues(table)
+      table_getGlobalFacetedUniqueValues(table)
   },
 }
