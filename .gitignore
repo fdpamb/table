@@ -10,3 +10,7 @@ react-table.css
 .DS_Store
 .history
 .vscode
+.settings
+.project
+package-lock.json
+yarn.lock

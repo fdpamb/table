@@ -1,15 +1,13 @@
-import nodeResolve from 'rollup-plugin-node-resolve'
-import babel from 'rollup-plugin-babel'
-import replace from 'rollup-plugin-replace'
-import commonjs from 'rollup-plugin-commonjs'
-import uglify from 'rollup-plugin-uglify'
+const babel = require('@rollup/plugin-babel').default;
+const commonjs = require('@rollup/plugin-commonjs');
+const nodeResolve = require('@rollup/plugin-node-resolve').default;
+const replace = require('@rollup/plugin-replace');
+const { uglify } = require('@blaumaus/rollup-plugin-uglify');
 
-const env = process.env.NODE_ENV
-
-const config = {
+const config = (isProd) => ({
   input: 'src/index.js',
   output: {
-    file: env === 'production' ? 'react-table.min.js' : 'react-table.js',
+    file: isProd ? 'react-table.min.js' : 'react-table.js',
     format: 'umd',
     globals: {
       react: 'React',
@@ -17,30 +15,28 @@ const config = {
     name: 'ReactTable',
     exports: 'named',
   },
-  external: ['react'],
+  external: ['react', 'react-dom'],
   plugins: [
     nodeResolve(),
     babel({
       exclude: '**/node_modules/**',
+      babelHelpers: 'bundled'
     }),
     replace({
-      'process.env.NODE_ENV': JSON.stringify(env),
+      'process.env.NODE_ENV': JSON.stringify(isProd ? 'production' : 'development'),
     }),
     commonjs({
       namedExports: {
         'react-is': ['isValidElementType', 'isElement'],
       },
     }),
+    isProd ? uglify({
+      compress: {
+        dead_code: true,
+        //warnings: false,
+      },
+    }) : null,
   ],
-}
+});
 
-if (env === 'production') {
-  config.plugins.push(uglify({
-    compress: {
-      dead_code: true,
-      warnings: false,
-    },
-  }))
-}
-
-export default config
+module.exports = [false, true].map(config);
