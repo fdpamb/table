@@ -69,7 +69,7 @@
     "autoprefixer": "^10.4.21",
     "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
-    "eslint-config-prettier": "^10.1.1",
+    "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-class-property": "^1.1.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
@@ -86,7 +86,7 @@
     "react-dom": "^18.3.1",
     "react-json-tree": "^0.20.0",
     "rimraf": "^6.0.1",
-    "rollup": "^4.39.0",
+    "rollup": "^4.40.0",
     "standard": "^17.1.2",
     "stylus": "^0.64.0"
   },
