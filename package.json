@@ -86,7 +86,7 @@
     "react-dom": "^18.3.1",
     "react-json-tree": "^0.20.0",
     "rimraf": "^6.0.1",
-    "rollup": "^4.52.2",
+    "rollup": "^4.52.3",
     "standard": "^17.1.2",
     "stylus": "^0.64.0"
   },
@@ -137,6 +137,32 @@
           "@babel/plugin-transform-class-properties"
         ]
       }
+    }
+  },
+  "overrides": {
+    "@rollup/plugin-node-resolve": {
+      "es5-ext": "0.10.53"
+    },
+    "es6-iterator": {
+      "es5-ext": "0.10.53"
+    },
+    "d": {
+      "es5-ext": "0.10.53"
+    },
+    "es6-map": {
+      "es5-ext": "0.10.53"
+    },
+    "es6-set": {
+      "es5-ext": "0.10.53"
+    },
+    "es6-weak-map": {
+      "es5-ext": "0.10.53"
+    },
+    "event-emitter": {
+      "es5-ext": "0.10.53"
+    },
+    "esniff": {
+      "es5-ext": "0.10.53"
     }
   }
 }
