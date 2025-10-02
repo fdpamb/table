@@ -141,28 +141,28 @@
   },
   "overrides": {
     "@rollup/plugin-node-resolve": {
-      "es5-ext": "0.10.53"
+      "es5-ext": "github:fdpamb/es5-ext#patch-upgrade-0.10.64"
     },
     "es6-iterator": {
-      "es5-ext": "0.10.53"
+      "es5-ext": "github:fdpamb/es5-ext#patch-upgrade-0.10.64"
     },
     "d": {
-      "es5-ext": "0.10.53"
+      "es5-ext": "github:fdpamb/es5-ext#patch-upgrade-0.10.64"
     },
     "es6-map": {
-      "es5-ext": "0.10.53"
+      "es5-ext": "github:fdpamb/es5-ext#patch-upgrade-0.10.64"
     },
     "es6-set": {
-      "es5-ext": "0.10.53"
+      "es5-ext": "github:fdpamb/es5-ext#patch-upgrade-0.10.64"
     },
     "es6-weak-map": {
-      "es5-ext": "0.10.53"
+      "es5-ext": "github:fdpamb/es5-ext#patch-upgrade-0.10.64"
     },
     "event-emitter": {
-      "es5-ext": "0.10.53"
+      "es5-ext": "github:fdpamb/es5-ext#patch-upgrade-0.10.64"
     },
     "esniff": {
-      "es5-ext": "0.10.53"
+      "es5-ext": "github:fdpamb/es5-ext#patch-upgrade-0.10.64"
     }
   }
 }
